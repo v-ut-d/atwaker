@@ -19,19 +19,38 @@ client = discord.Client(intents=intents)
 # channelid=os.environ['CHANNEL']
 # serverid=os.environ['SERVER']
 # thisbotid=os.environ['THISBOT']
-channelid=805672534523379733
+channelid=805226148195074089
 serverid=805058528485965894
 thisbotid=807869171491668020
 print(client.get_channel(channelid))
-emj='<:ohayo:805676181328232448>'
 z=86400*((365.25*50)//1+5/8)//1
 hs=6
 ms=0
 interv=15
 clen=360
 v=None
-contesting=False
+emj='<:ohayo:805676181328232448>'
+contesting=0
 rk=1
+
+def load_vars():
+  global v
+  dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
+  v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+  global emj
+  global contesting
+  global rk
+  emj=dbv.loc['emj','variables']
+  contesting=int(dbv.loc['contesting','variables'])
+  rk=int(dbv.loc['rk','variables'])
+  return
+
+def save_vars():
+  vars=[[np.nan,'variables'],['emj',str(emj)],['rk',rk],['contesting',contesting]]
+  vars.to_csv('variables_'+str(serverid)+'.csv')
+  v.to_csv('v_'+str(serverid)+'.csv')
+
+
 
 def renew_db(serverid):
   guild=client.get_guild(serverid)
@@ -75,16 +94,19 @@ async def contest():
   global v
   db=pd.read_csv('AtWaker_data_'+str(serverid)+'.csv',header=0,index_col=0)
   v=pd.DataFrame([[np.nan,np.nan] for _ in range(len(db.columns))],columns=['rank','time'],index=db.columns)
+  save_vars()
   dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
   global rk
   rk=1
+  save_vars()
   start=time.time()
   msg=await channel.send('おはようございます！ Good morning!\n'+dt
                                             +'のAtWaker Contest開始です。\n起きた人は'
                                             +emj+'でリアクションしてね。')
   await msg.add_reaction(emoji=emj)
   global contesting
-  contesting=True
+  contesting=1
+  save_vars()
   print('Contest started')
   
   
@@ -94,7 +116,8 @@ async def contest_end():
   channel = client.get_channel(channelid)
   dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
   global contesting
-  contesting=False
+  contesting=0
+  save_vars()
   if rk>1:
       await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
                                     +str(rk-1)+'人でした。')
@@ -182,6 +205,13 @@ def rate_calc(db,dt):
 async def on_ready():
   # 起動したらターミナルにログイン通知が表示される
   print('ログインしました。')
+  channel = client.get_channel(channelid)
+  if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
+        renew_db(serverid)
+      else:
+        make_db(serverid)
+      await channel.send('起動しました。')
+  if 
   return
 
 # リアクション受信時に動作する処理
@@ -189,7 +219,7 @@ async def on_ready():
 async def on_reaction_add(reaction,user):
   global v
   global rk
-  if contesting and (user.id!=807869171491668020):
+  if (contesting==1) and (user.id!=807869171491668020):
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     bool1=(str(reaction.emoji)==str(emj))
     bool2=(reaction.message.author.id==807869171491668020) 
@@ -199,6 +229,7 @@ async def on_reaction_add(reaction,user):
       print(rk,user.display_name)
       v=record_rank(user,rk,v)
       rk+=1
+      save_vars()
   return
   
 
@@ -215,6 +246,7 @@ async def on_message(message):
     if message.content.startswith("!atw start "):
       global emj
       emj=message.content[11:]
+      save_vars()
       print(emj)
       if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
         renew_db(serverid)
@@ -262,12 +294,19 @@ async def loop():
   # 現在の時刻
   now=(time.time()+3600*9)%86400
   print(now)
-  print((3600*hs+60*ms<=now<3600*hs+60*(ms+interv)) ,not (serverid==None) ,not (channelid==None))
-  if (3600*hs+60*ms<=now<3600*hs+60*(ms+interv)) and (not (serverid==None) and not (channelid==None)):
+  bool1l=(3600*hs+60*ms<=now<3600*hs+60*(ms+interv))
+  bool2l= (serverid!=None)
+  bool3l= (channelid!=None)
+  print(bool1l ,bool2l ,bool3l)
+  if bool1l and bool2l and bool3l:
     await contest()
-  elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and contesting:
+  elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (contesting==1):
     await contest_end()
   return
+
+#変数読み込み
+load_vars()
+
 #ループ処理実行
 loop.start()
 
