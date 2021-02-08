@@ -4,7 +4,7 @@ import numpy as np
 import os
 from discord.ext import tasks
 from datetime import datetime ,timedelta
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import time
 import asyncio
 
