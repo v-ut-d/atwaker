@@ -23,7 +23,7 @@ channelid=805672534523379733
 serverid=805058528485965894
 thisbotid=807869171491668020
 print(client.get_channel(channelid))
-emj=<:ohayo:805676181328232448>
+emj='<:ohayo:805676181328232448>'
 z=86400*((365.25*50)//1+5/8)//1
 hs=6
 ms=0
