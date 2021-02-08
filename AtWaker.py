@@ -24,10 +24,10 @@ serverid=805058528485965894
 thisbotid=807869171491668020
 print(client.get_channel(channelid))
 z=86400*((365.25*50)//1+5/8)//1
-hs=((time.time()+3600*9)%86400)//3600
-ms=(time.time()%3600)//60+1
-interv=0.25
-clen=1
+hs=6
+ms=0
+interv=15
+clen=360
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
