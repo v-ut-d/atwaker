@@ -28,6 +28,10 @@ hs=6
 ms=0
 interv=15
 clen=360
+hs=((time.time()+3600*9)%86400)//3600
+ms=((time.time())%3600)//60+1
+interv=0.25
+clen=1
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
@@ -296,8 +300,9 @@ async def loop():
   bool1l=(3600*hs+60*ms<=now<3600*hs+60*(ms+interv))
   bool2l= (serverid!=None)
   bool3l= (channelid!=None)
-  print(bool1l ,bool2l ,bool3l)
-  if bool1l and bool2l and bool3l:
+  bool4l= (contesting==0)
+  print(bool1l ,bool2l ,bool3l,bool4l)
+  if bool1l and bool2l and bool3l and bool4l:
     await contest()
   elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (contesting==1):
     await contest_end()
