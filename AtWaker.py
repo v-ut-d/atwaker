@@ -163,7 +163,12 @@ def rate_calc(db,dt):
       for i in range(len(vperf)):
         ratenom+=2.0**(vperf[i]/800)*(0.9**(i+1))
         rateden+=0.9**(i+1)
-      dbr.loc[dt,xx]=int(800*np.log(ratenom/rateden)/np.log(2))
+      raz=len(vperf)
+      corr=((1-0.81**raz)**0.5/(1-0.9**raz)-1)/(19**0.5-1)*1200
+      rate=800*np.log(ratenom/rateden)/np.log(2)-corr
+      if rate<=400:
+        rate=400*np.e**(rate/400-1)
+      dbr.loc[dt,xx]=int(rate+0.5)
   dbr.to_csv('AtWaker_rate_'+str(serverid)+'.csv')
   return
 
