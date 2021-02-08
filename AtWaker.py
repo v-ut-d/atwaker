@@ -46,7 +46,7 @@ def load_vars():
   return
 
 def save_vars():
-  vars=[[np.nan,'variables'],['emj',str(emj)],['rk',rk],['contesting',contesting]]
+  vars=pd.DataFrame([[str(emj)],[rk],[contesting]],index=['emj','rk','contesting'],columns=['variables'])
   vars.to_csv('variables_'+str(serverid)+'.csv')
   v.to_csv('v_'+str(serverid)+'.csv')
 
