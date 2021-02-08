@@ -207,11 +207,10 @@ async def on_ready():
   print('ログインしました。')
   channel = client.get_channel(channelid)
   if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
-        renew_db(serverid)
-      else:
-        make_db(serverid)
-      await channel.send('起動しました。')
-  if 
+    renew_db(serverid)
+  else:
+    make_db(serverid)
+  await channel.send('起動しました。')
   return
 
 # リアクション受信時に動作する処理
