@@ -29,14 +29,16 @@ hs=6
 ms=0
 interv=1
 clen=360
+msg_raz=6
 # hs=((time.time()+3600*9)%86400)//3600
 # ms=((time.time())%3600)//60+1
 # interv=0.25
-# clen=1
+# clen=5
+# msg_raz=5
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
-rk=1
+num_ra=0
 min_display=20
 conn=r.connect()
 
@@ -63,14 +65,14 @@ def load_vars():
     v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
     global emj
     global contesting
-    global rk
+    global num_ra
     emj=dbv.loc['emj','variables']
     contesting=int(dbv.loc['contesting','variables'])
-    rk=int(dbv.loc['rk','variables'])
+    num_ra=int(dbv.loc['num_ra','variables'])
     return
 
 def save_vars():
-    vars=pd.DataFrame([[str(emj)],[rk],[contesting]],index=['emj','rk','contesting'],columns=['variables'])
+    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting]],index=['emj','num_ra','contesting'],columns=['variables'])
     vars.to_csv('variables_'+str(serverid)+'.csv')
     v.to_csv('v_'+str(serverid)+'.csv')
 
@@ -101,8 +103,8 @@ def make_db(serverid):
 #                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u.id==807869171491668020))))
 #     print('rep1')
 #     if r.emoji==emj:
-#       v=record_rank(user,rk,v)
-#       rk+=1
+#       v=record_rank(user,num_ra,v)
+#       num_ra+=1
 #     elif r.emoji==emj2:
 #       break
 
@@ -117,20 +119,23 @@ async def contest():
     channel = client.get_channel(channelid)
     global v
     db=get_cached_df('AtWaker_data_'+str(serverid))
-    v=pd.DataFrame([[np.nan,np.nan] for _ in range(len(db.columns))],columns=['rank','time'],index=db.columns)
+    v=pd.DataFrame(columns=['rank','time']+[str(i) for i in range(msg_raz)]+['total'],index=[])
     save_vars()
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
-    global rk
-    rk=1
+    global num_ra
+    num_ra=0
     save_vars()
     start=time.time()
     msg=await channel.send('おはようございます！ Good morning!\n'+dt
-                                                                                        +'のAtWaker Contest開始です。\n起きた人は'
-                                                                                        +emj+'でリアクションしてね。')
-    await msg.add_reaction(emoji=emj)
+                            +'のAtWaker Contest開始です。\n起きた人は下のメッセージに'
+                            +emj+'でリアクションしてね。')
     global contesting
     contesting=1
     save_vars()
+    
+async def contest_msg(i):
+    msg=await channel.send(str(i+1)+'回目')    
+    await msg.add_reaction(emoji=emj)
     print('Contest started')
     
     
@@ -142,14 +147,14 @@ async def contest_end():
     global contesting
     contesting=0
     save_vars()
-    if rk>1:
+    if num_ra>0:
             await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
-                                                                        +str(rk-1)+'人でした。')
+                                                                        +str(len(v))+'人でした。')
             db.loc[dt]=[np.nan for _ in range(len(db.columns))]
             db=perf_calc(db,v)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
-            for j in range(1,min(min_display+1,rk)):
+            for j in range(1,min(min_display+1,len(v))):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
                 await channel.send(str(j)+'位:'+jthuser.display_name+' '
                                                                                 +vs.iloc[j-1].loc['time']+' パフォーマンス:'
@@ -159,16 +164,20 @@ async def contest_end():
     cache_df('AtWaker_data_'+str(serverid),db)
     return
     
-def record_rank(user,rk,v):
+def record_rank(user,num_ra,v,i):
     vc=v.copy()
-    if vc.loc[str(user.id),'rank']!=vc.loc[str(user.id),'rank']:
+    if not (str(user.id) in vc.index):
+        vc.loc[str(user.id)]=[0]*len(vc.columns)
         vc.loc[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
-        vc.loc[str(user.id),'rank']=rk
+    vc.loc[str(user.id),str(i)]=(time.time()-3600*(hs-9)-60*ms)%86400
     return vc
 
 def perf_calc(db,v):
     dbc=db.copy()
-    vc=v['rank'].dropna().sort_values()
+    v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
+    v=v.sort_values(by='total')
+    v['rank']=list(range(1,len(v)+1))
+    vc=v['rank']
     print(vc)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
     for user in vc.index:
@@ -244,18 +253,18 @@ async def on_ready():
 @client.event
 async def on_reaction_add(reaction,user):
     global v
-    global rk
     if (contesting==1) and (user.id!=807869171491668020):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
-        bool1=(str(reaction.emoji)==str(emj))
-        bool2=(reaction.message.author.id==807869171491668020) 
-        bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
-        print(bool1,bool2,bool3)
-        if bool1 and bool2 and bool3:
-            print(rk,user.display_name)
-            v=record_rank(user,rk,v)
-            rk+=1
-            save_vars()
+        for i in range(msg_raz):
+            bool1=(str(reaction.emoji)==str(emj))
+            bool2=(reaction.message.author.id==807869171491668020) 
+            # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
+            bool3=(reaction.message.content==str(i+1)+'回目')
+            print(bool1,bool2,bool3)
+            if bool1 and bool2 and bool3:
+                print(num_ra,user.display_name)
+                v=record_rank(user,num_ra,v,i)
+                save_vars()
     return
     
 
@@ -315,8 +324,8 @@ async def on_message(message):
                     try:
                         z=max(int(message.content[20:]),1)
                         for rk in range(z-1,z-1+min_display):
-                            rate=str(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
-                            userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
+                            rate=str(dbr.iloc[-1].sort_values(ascending=False).iloc[num_ra])
+                            userid=int(dbr.iloc[-1].sort_values(ascending=False).index[num_ra])
                             if guild.get_member(userid)==None:
                                 username='[deleted]'
                             else:
@@ -335,8 +344,8 @@ async def on_message(message):
                     a,b=message.content[18:].split()
                     z=max(int(b),1)
                     for rk in range(z-1,z-1+min_display):
-                        perf=str(dbd.loc[a].sort_values(ascending=False).iloc[rk])
-                        userid=int(dbd.loc[a].sort_values(ascending=False).index[rk])
+                        perf=str(dbd.loc[a].sort_values(ascending=False).iloc[num_ra])
+                        userid=int(dbd.loc[a].sort_values(ascending=False).index[num_ra])
                         if guild.get_member(userid)==None:
                             username='[deleted]'
                         else:
@@ -377,6 +386,9 @@ async def loop():
     print(bool1l ,bool2l ,bool3l,bool4l,bool5l,bool6l)
     if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
+    for i in range(msg_raz):
+        if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
+            contest_msg(i)
     elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (contesting==1):
         await contest_end()
     return
