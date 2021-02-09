@@ -17,26 +17,27 @@ TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
-# channelid=os.environ['CHANNEL']
-# serverid=os.environ['SERVER']
-# thisbotid=os.environ['THISBOT']
-channelid=805226148195074089
-serverid=805058528485965894
-thisbotid=807869171491668020
+channelid=int(os.environ['CHANNEL'])
+serverid=int(os.environ['SERVER'])
+thisbotid=int(os.environ['THISBOT'])
+# channelid=805226148195074089
+# serverid=805058528485965894
+# thisbotid=807869171491668020
 print(client.get_channel(channelid))
 z=86400*((365.25*50)//1+5/8)//1
 hs=6
 ms=0
-interv=15
+interv=1
 clen=360
-hs=((time.time()+3600*9)%86400)//3600
-ms=((time.time())%3600)//60+1
-interv=0.25
-clen=1
+# hs=((time.time()+3600*9)%86400)//3600
+# ms=((time.time())%3600)//60+1
+# interv=0.25
+# clen=1
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
 rk=1
+min_display=20
 conn=r.connect()
 
 def cache_df(alias,df):
@@ -148,7 +149,7 @@ async def contest_end():
             db=perf_calc(db,v)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
-            for j in range(1,min(11,rk)):
+            for j in range(1,min(min_display+1,rk)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
                 await channel.send(str(j)+'位:'+jthuser.display_name+' '
                                                                                 +vs.iloc[j-1].loc['time']+' パフォーマンス:'
