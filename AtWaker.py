@@ -328,8 +328,8 @@ async def loop():
     bool4l= (contesting==0)
     dfd=get_cached_df('AtWaker_data_'+str(serverid))
     dfr=get_cached_df('AtWaker_rate_'+str(serverid))
-    bool5l=not (dfd==None)
-    bool6l=not (dfr==None)
+    bool5l=isinstance(dfd, pd.DataFrame):
+    bool6l=isinstance(dfr, pd.DataFrame):
     print(bool1l ,bool2l ,bool3l,bool4l,bool5l,bool6l)
     if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
