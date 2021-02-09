@@ -1,3 +1,7 @@
+django
+gunicorn
+django-heroku
+django-googledrive-storage
 discord.py
 pandas
 numpy

@@ -7,6 +7,7 @@ from datetime import datetime ,timedelta
 # from dotenv import load_dotenv
 import time
 import asyncio
+import gdstorage
 
 # .envファイルの内容を読み込みます
 # load_dotenv()
