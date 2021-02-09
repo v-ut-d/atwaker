@@ -7,8 +7,8 @@ from datetime import datetime ,timedelta
 # from dotenv import load_dotenv
 import time
 import asyncio
-import pyarrow as pa
 import r
+import pickle
 
 # .envファイルの内容を読み込みます
 # load_dotenv()
@@ -40,7 +40,7 @@ rk=1
 conn=r.connect()
 
 def cache_df(alias,df):
-    df_compressed = pa.serialize(df).to_buffer().to_pybytes()
+    df_compressed = pickle.dumps(df)
     res = conn.set(alias,df_compressed)
     if res == True:
         print('df cached')
@@ -50,7 +50,7 @@ def cache_df(alias,df):
 def get_cached_df(alias):
     try:
         data = r.get(alias)
-        return pa.deserialize(data)
+        return pickle.loads(data)
     except:
         print("No data")
         return None
