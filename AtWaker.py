@@ -298,6 +298,7 @@ async def on_message(message):
                                 zant="(暫定)"
                         else:
                             rate=0
+                            zant="(未参加)"
                         await channel.send(xx.display_name+':'+str(rate)+zant)
                 if num==0:
                     await channel.send('ユーザーが見つかりません。')
