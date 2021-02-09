@@ -276,7 +276,7 @@ async def on_message(message):
             else:
                 make_db(serverid)
             await channel.send('起動しました。')
-        elif (message.content=="!atw reset "+TOKEN) and (message.author.id==602203895464329216):
+        elif (message.content=="!atw reset") and (message.author.id==602203895464329216):
             conn.delete('AtWaker_rate_'+str(serverid))
             print("rate cache reset")
             conn.delete('AtWaker_data_'+str(serverid))
