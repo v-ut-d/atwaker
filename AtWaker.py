@@ -124,14 +124,15 @@ async def contest():
     save_vars()
     start=time.time()
     msg=await channel.send('おはようございます！ Good morning!\n'+dt
-                            +'のAtWaker Contest開始です。\n起きた人は下のメッセージに'
+                            +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+' 〇回目」の\nメッセージに'
                             +emj+'でリアクションしてね。')
     global contesting
     contesting=1
     save_vars()
     
 async def contest_msg(i):
-    msg=await channel.send(str(i+1)+'回目')    
+    dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
+    msg=await channel.send(dt+' '+str(i+1)+'回目')    
     await msg.add_reaction(emoji=emj)
     print('Contest started')
     
@@ -166,13 +167,13 @@ def record_rank(user,num_ra,v,i):
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
         vc.loc[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
-    vc.loc[str(user.id),str(i)]=(time.time()-3600*(hs-9)-60*ms)%86400
+    vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
     return vc
 
 def perf_calc(db,v):
     dbc=db.copy()
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
-    v=v.sort_values(by='total')
+    v=v.sort_values(by='total',ascending=False)
     v['rank']=list(range(1,len(v)+1))
     vc=v['rank']
     print(vc)
@@ -256,7 +257,7 @@ async def on_reaction_add(reaction,user):
             bool1=(str(reaction.emoji)==str(emj))
             bool2=(reaction.message.author.id==807869171491668020) 
             # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
-            bool3=(reaction.message.content==str(i+1)+'回目')
+            bool3=(reaction.message.content==dt+' '+str(i+1)+'回目')
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
                 print(num_ra,user.display_name)
