@@ -1,5 +1,5 @@
 discord.py
 pandas
 numpy
-pyarrow
+pickle
 redis
