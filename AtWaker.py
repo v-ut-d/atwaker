@@ -326,8 +326,10 @@ async def loop():
     bool2l= (serverid!=None)
     bool3l= (channelid!=None)
     bool4l= (contesting==0)
-    print(bool1l ,bool2l ,bool3l,bool4l)
-    if bool1l and bool2l and bool3l and bool4l:
+    bool5l=(get_cached_df('AtWaker_data_'+str(serverid))!=None)
+    bool6l=(get_cached_df('AtWaker_rate_'+str(serverid))!=None)
+    print(bool1l ,bool2l ,bool3l,bool4l,bool5l,bool6l)
+    if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
     elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (contesting==1):
         await contest_end()
