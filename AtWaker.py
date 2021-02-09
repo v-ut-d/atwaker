@@ -229,7 +229,7 @@ async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print('ログインしました。')
     channel = client.get_channel(channelid)
-    if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
+    if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
         renew_db(serverid)
     else:
         make_db(serverid)
@@ -270,7 +270,7 @@ async def on_message(message):
             emj=message.content[11:]
             save_vars()
             print(emj)
-            if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
+            if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
                 renew_db(serverid)
             else:
                 make_db(serverid)
@@ -282,7 +282,7 @@ async def on_message(message):
             print("data cache reset")
             make_db(serverid)
         elif message.content.startswith("!atw rating "):
-            if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
+            if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
                 dbr=get_cached_df('AtWaker_rate_'+str(serverid))
                 dbd=get_cached_df('AtWaker_data_'+str(serverid))
                 num=0
