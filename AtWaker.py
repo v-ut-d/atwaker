@@ -182,7 +182,7 @@ def perf_calc(db,v):
                 aperfnom+=past[i]*(0.9**(i+1))
                 aperfden+=0.9**(i+1)
             aperf[user]=aperfnom/aperfden
-    xx=0
+    xx=-int(800*np.log(len(vc))/np.log(6))
     s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
@@ -192,7 +192,10 @@ def perf_calc(db,v):
             s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
         dbc.iloc[-1].loc[vc.index[j]]=int(xx)
     if len(dbc)==1:
-        dbc.iloc[-1]=((dbc.iloc[-1]-1200)*3)//2+1200
+        dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
+    for j in range(len(vc))[::-1]:
+        if dbc.iloc[-1].loc[vc.index[j]]<=400:
+            dbc.iloc[-1].loc[vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
     return dbc
 
 def rate_calc(db,dt):
