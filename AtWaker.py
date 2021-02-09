@@ -8,11 +8,12 @@ from datetime import datetime ,timedelta
 import time
 import asyncio
 import gdstorage
+import pyarrow as pa
+import r
 
 # .envファイルの内容を読み込みます
 # load_dotenv()
-# TOKEN = os.environ['TOKEN']
-TOKEN='ODA3ODY5MTcxNDkxNjY4MDIw.YB-Qyw.ug72aycHBOcB4Zw9Xx0hWWdxWYM'
+TOKEN = os.environ['TOKEN']
 
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
@@ -37,6 +38,32 @@ v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
 rk=1
+conn=r.connect()
+
+def cache_df(alias,df):
+  context = pa.default_serialization_context()
+  df_compressed =  context.serialize(df).to_buffer().to_pybytes()
+
+  res = conn.set(alias,df_compressed)
+  if res == True:
+    print('df cached')
+
+
+
+def get_cached_df(alias):
+
+  context = pa.default_serialization_context()
+  all_keys = [key.decode("utf-8") for key in cur.keys()]
+
+  if alias in all_keys:   
+    result = conn.get(alias)
+
+    dataframe = pd.DataFrame.from_dict(context.deserialize(result))
+
+    return dataframe
+
+  return None
+
 
 def load_vars():
   global v
@@ -59,21 +86,21 @@ def save_vars():
 
 def renew_db(serverid):
   guild=client.get_guild(serverid)
-  db=pd.read_csv('AtWaker_data_'+str(serverid)+'.csv',header=0,index_col=0)
+  db=get_cached_df('AtWaker_data_'+str(serverid))
   for xx in {str(aa.id) for aa in guild.members}-set(db.index.astype(str)):
     db[xx]=[np.nan for _ in range(len(db))]
-  db.to_csv('AtWaker_data_'+str(serverid)+'.csv')
-  dbr=pd.read_csv('AtWaker_rate_'+str(serverid)+'.csv',header=0,index_col=0)
+  cache_df('AtWaker_data_'+str(serverid),db)
+  dbr=get_cached_df('AtWaker_rate_'+str(serverid))
   for xx in {str(aa.id) for aa in guild.members}-set(dbr.index.astype(str)):
     dbr[xx]=[np.nan for _ in range(len(dbr))]
-  dbr.to_csv('AtWaker_rate_'+str(serverid)+'.csv')
+  cache_df('AtWaker_rate_'+str(serverid),dbr)
   
 def make_db(serverid):
   guild=client.get_guild(serverid)
   db=pd.DataFrame(columns=[str(xx.id) for xx in guild.members],index=[])
-  db.to_csv('AtWaker_data_'+str(serverid)+'.csv')
+  cache_df('AtWaker_data_'+str(serverid),db)
   dbr=pd.DataFrame(columns=[str(xx.id) for xx in guild.members],index=[])
-  dbr.to_csv('AtWaker_rate_'+str(serverid)+'.csv')
+  cache_df('AtWaker_rate_'+str(serverid),dbr)
   
 # async def repeat1(start,msg):
 #   while time.time()-start<60*(clen+1):
@@ -97,7 +124,7 @@ def make_db(serverid):
 async def contest():
   channel = client.get_channel(channelid)
   global v
-  db=pd.read_csv('AtWaker_data_'+str(serverid)+'.csv',header=0,index_col=0)
+  db=get_cached_df('AtWaker_data_'+str(serverid))
   v=pd.DataFrame([[np.nan,np.nan] for _ in range(len(db.columns))],columns=['rank','time'],index=db.columns)
   save_vars()
   dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
@@ -117,7 +144,7 @@ async def contest():
   
 async def contest_end():
   print('Contest ended')
-  db=pd.read_csv('AtWaker_data_'+str(serverid)+'.csv',header=0,index_col=0)
+  db=get_cached_df('AtWaker_data_'+str(serverid))
   channel = client.get_channel(channelid)
   dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
   global contesting
@@ -137,7 +164,7 @@ async def contest_end():
                                         +str(int(db.loc[dt,vs.index[j-1]])))
   else:
     await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
-  db.to_csv('AtWaker_data_'+str(serverid)+'.csv')
+  cache_df('AtWaker_data_'+str(serverid),db)
   return
   
 def record_rank(user,rk,v):
@@ -177,7 +204,7 @@ def perf_calc(db,v):
   return dbc
 
 def rate_calc(db,dt):
-  dbr=pd.read_csv('AtWaker_rate_'+str(serverid)+'.csv',header=0,index_col=0)
+  dbr=get_cached_df('AtWaker_rate_'+str(serverid))
   if len(dbr)>0:
     vlast=dbr.iloc[-1]
     dbr.loc[dt]=vlast
@@ -197,7 +224,7 @@ def rate_calc(db,dt):
       if rate<=400:
         rate=400*np.e**(rate/400-1)
       dbr.loc[dt,xx]=int(rate+0.5)
-  dbr.to_csv('AtWaker_rate_'+str(serverid)+'.csv')
+  cache_df('AtWaker_rate_'+str(serverid),dbr)
   return
 
 
@@ -211,7 +238,7 @@ async def on_ready():
   # 起動したらターミナルにログイン通知が表示される
   print('ログインしました。')
   channel = client.get_channel(channelid)
-  if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
+  if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
     renew_db(serverid)
   else:
     make_db(serverid)
@@ -252,15 +279,21 @@ async def on_message(message):
       emj=message.content[11:]
       save_vars()
       print(emj)
-      if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
+      if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
         renew_db(serverid)
       else:
         make_db(serverid)
       await channel.send('起動しました。')
+    elif (message.content=="!atw reset "+TOKEN) and (message.author.id==602203895464329216):
+      conn.delete('AtWaker_rate_'+str(serverid))
+      print("rate cache reset")
+      conn.delete('AtWaker_data_'+str(serverid))
+      print("data cache reset")
+      make_db(serverid)
     elif message.content.startswith("!atw rating "):
-      if os.path.exists('AtWaker_data_'+str(serverid)+'.csv') and os.path.exists('AtWaker_rate_'+str(serverid)+'.csv'):
-        dbr=pd.read_csv('AtWaker_rate_'+str(serverid)+'.csv',header=0,index_col=0)
-        dbd=pd.read_csv('AtWaker_data_'+str(serverid)+'.csv',header=0,index_col=0)
+      if (get_cached_df('AtWaker_rate_'+str(serverid))!=None) and  (get_cached_df('AtWaker_data_'+str(serverid))!=None):
+        dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+        dbd=get_cached_df('AtWaker_data_'+str(serverid))
         num=0
         print(len(channel.guild.members))
         for xx in channel.guild.members:
