@@ -268,6 +268,7 @@ async def on_message(message):
         # serverid=message.channel.guild.id
         # channelid=message.channel.id
     channel = client.get_channel(channelid)
+    guild=client.get_guild(serverid)
     if message.content.startswith("!atw ") and (message.author.id!=thisbotid):
         if message.content.startswith("!atw start "):
             global emj
@@ -305,6 +306,44 @@ async def on_message(message):
                         await channel.send(xx.display_name+':'+str(rate)+zant)
                 if num==0:
                     await channel.send('ユーザーが見つかりません。')
+            else:
+                await channel.send('初めに!atw start (絵文字)を実行してください。')
+        elif  message.content.startswith("!atw rating-ranking "):
+            if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame):
+                dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+                if len(dbr)>0:
+                    try:
+                        z=max(int(message.content[20:]),1)
+                        for rk in range(z-1,z-1+min_display):
+                            rate=str(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
+                            userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
+                            if guild.get_member(userid)==None:
+                                username='[deleted]'
+                            else:
+                                username=guild.get_member(userid).display_name
+                            await channel.send(str(rk+1)+'位:'+username+' '+rate)
+                    except:
+                        await channel.send('引数が不正です。')
+                else:
+                    await channel.send('まだコンテストが開催されていません。')
+            else:
+                await channel.send('初めに!atw start (絵文字)を実行してください。')
+        elif  message.content.startswith("!atw perf-ranking "):
+            if isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
+                dbd=get_cached_df('AtWaker_data_'+str(serverid))
+                try:
+                    a,b=message.content[18:].split()
+                    z=max(int(b),1)
+                    for rk in range(z-1,z-1+min_display):
+                        perf=str(dbd.loc[a].sort_values(ascending=False).iloc[rk])
+                        userid=int(dbd.loc[a].sort_values(ascending=False).index[rk])
+                        if guild.get_member(userid)==None:
+                            username='[deleted]'
+                        else:
+                            username=guild.get_member(userid).display_name
+                        await channel.send(str(rk+1)+'位:'+username+' '+perf)
+                except:
+                    await channel.send('引数が不正です。')
             else:
                 await channel.send('初めに!atw start (絵文字)を実行してください。')
         elif message.content=="!atw help":
