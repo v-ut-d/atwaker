@@ -20,9 +20,6 @@ client = discord.Client(intents=intents)
 channelid=int(os.environ['CHANNEL'])
 serverid=int(os.environ['SERVER'])
 thisbotid=int(os.environ['THISBOT'])
-# channelid=805226148195074089
-# serverid=805058528485965894
-# thisbotid=807869171491668020
 print(client.get_channel(channelid))
 z=86400*((365.25*50)//1+5/8)//1
 hs=6
@@ -30,11 +27,11 @@ ms=0
 interv=1
 clen=360
 msg_raz=6
-# hs=((time.time()+3600*9)%86400)//3600
-# ms=((time.time())%3600)//60+1
-# interv=0.25
-# clen=5
-# msg_raz=5
+hs=((time.time()+3600*9)%86400)//3600
+ms=((time.time())%3600)//60+1
+interv=0.25
+clen=5
+msg_raz=5
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
@@ -289,12 +286,25 @@ async def on_message(message):
             else:
                 make_db(serverid)
             await channel.send('起動しました。')
-        elif (message.content=="!atw reset") and (message.author.id==602203895464329216):
-            conn.delete('AtWaker_rate_'+str(serverid))
-            print("rate cache reset")
-            conn.delete('AtWaker_data_'+str(serverid))
-            print("data cache reset")
-            make_db(serverid)
+        elif (message.content.startswith("!atw reset ")) and (message.author.id==602203895464329216):
+            if message.content[11:]=='all':
+                conn.delete('AtWaker_rate_'+str(serverid))
+                print("rate cache reset")
+                conn.delete('AtWaker_data_'+str(serverid))
+                print("data cache reset")
+                make_db(serverid)
+                await channel.send('データを全て消去しました。')
+            else:
+                try:
+                    dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+                    dbd=get_cached_df('AtWaker_data_'+str(serverid))
+                    dbr.drop(message.content[11:],axis=0)
+                    dbd.drop(message.content[11:],axis=0)
+                    cache_df('AtWaker_rate_'+str(serverid),dbr)
+                    cache_df('AtWaker_data_'+str(serverid),dbd)
+                    await channel.send(message.content[11:]+'のデータを消去しました。')
+                except:
+                    await channel.send('引数が不正です。')
         elif message.content.startswith("!atw rating "):
             if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
                 dbr=get_cached_df('AtWaker_rate_'+str(serverid))
