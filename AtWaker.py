@@ -49,7 +49,7 @@ def cache_df(alias,df):
 
 def get_cached_df(alias):
     try:
-        data = r.get(alias)
+        data = conn.get(alias)
         return pickle.loads(data)
     except:
         print("No data")
