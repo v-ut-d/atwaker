@@ -135,6 +135,7 @@ async def contest():
     return
     
 async def contest_msg(i):
+    channel = client.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt+' '+str(i+1)+'回目')    
     await msg.add_reaction(emoji=emj)
