@@ -332,17 +332,23 @@ async def on_message(message):
         elif  message.content.startswith("!atw rating-ranking "):
             if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame):
                 dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+                dbd=get_cached_df('AtWaker_data_'+str(serverid))
                 if len(dbr)>0:
                     try:
                         z=max(int(message.content[20:]),1)
                         for rk in range(z-1,z-1+min_display):
-                            rate=str(dbr.iloc[-1].sort_values(ascending=False).iloc[num_ra])
+                            rate=str(int(dbr.iloc[-1].sort_values(ascending=False).iloc[num_ra]))
                             userid=int(dbr.iloc[-1].sort_values(ascending=False).index[num_ra])
+                            zant=""
                             if guild.get_member(userid)==None:
                                 username='[deleted]'
                             else:
                                 username=guild.get_member(userid).display_name
-                            await channel.send(str(rk+1)+'位:'+username+' '+rate)
+                            if len(dbd[str(userid)].dropna())==0:
+                                zant="(未参加)"
+                            elif len(dbd[str(userid)].dropna())<14:
+                                zant="(暫定)"
+                            await channel.send(str(rk+1)+'位:'+username+' '+rate+zant)
                     except:
                         await channel.send('引数が不正です。')
                 else:
