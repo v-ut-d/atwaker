@@ -156,7 +156,7 @@ async def contest_end():
             db=perf_calc(db,v)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
-            for j in range(1,min(min_display+1,len(v))):
+            for j in range(1,min(min_display+1,len(v)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
                 await channel.send(str(j)+'位:'+jthuser.display_name+' '
                                                                                 +vs.iloc[j-1].loc['time']+' パフォーマンス:'
@@ -177,9 +177,11 @@ def record_rank(user,num_ra,v,i):
 
 def perf_calc(db,v):
     dbc=db.copy()
+    global v
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
     v['rank']=list(range(1,len(v)+1))
+    save_vars()
     vc=v['rank']
     print(vc)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
@@ -342,9 +344,9 @@ async def on_message(message):
                 if len(dbr)>0:
                     try:
                         z=max(int(message.content[20:]),1)
-                        for rk in range(z-1,z-1+min_display):
-                            rate=str(int(dbr.iloc[-1].sort_values(ascending=False).iloc[num_ra]))
-                            userid=int(dbr.iloc[-1].sort_values(ascending=False).index[num_ra])
+                        for rk in range(z-1,min(z-1+min_display,len(dbr.columns))):
+                            rate=str(int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk]))
+                            userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
                             zant=""
                             if guild.get_member(userid)==None:
                                 username='[deleted]'
@@ -368,8 +370,8 @@ async def on_message(message):
                     a,b=message.content[18:].split()
                     z=max(int(b),1)
                     for rk in range(z-1,z-1+min_display):
-                        perf=str(dbd.loc[a].sort_values(ascending=False).iloc[num_ra])
-                        userid=int(dbd.loc[a].sort_values(ascending=False).index[num_ra])
+                        perf=str(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk])
+                        userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
                         if guild.get_member(userid)==None:
                             username='[deleted]'
                         else:
