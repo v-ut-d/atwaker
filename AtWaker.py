@@ -76,11 +76,11 @@ def save_vars():
 def renew_db(serverid):
     guild=client.get_guild(serverid)
     db=get_cached_df('AtWaker_data_'+str(serverid))
-    for xx in {str(aa.id) for aa in guild.members}-set(db.index.astype(str)):
+    for xx in {str(aa.id) for aa in guild.members}-set(db.columns.astype(str)):
         db[xx]=[np.nan for _ in range(len(db))]
     cache_df('AtWaker_data_'+str(serverid),db)
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-    for xx in {str(aa.id) for aa in guild.members}-set(dbr.index.astype(str)):
+    for xx in {str(aa.id) for aa in guild.members}-set(dbr.columns.astype(str)):
         dbr[xx]=[0 for _ in range(len(dbr))]
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     print("df renewed")
