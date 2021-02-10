@@ -17,7 +17,7 @@ intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
 channelid=int(os.environ['CHANNEL'])
-channelid=805226148195074089
+# channelid=805226148195074089
 serverid=int(os.environ['SERVER'])
 thisbotid=int(os.environ['THISBOT'])
 print(client.get_channel(channelid))
@@ -27,11 +27,11 @@ ms=0
 interv=1
 clen=360
 msg_raz=6
-hs=((time.time()+3600*9)%86400)//3600
-ms=((time.time())%3600)//60+1
-interv=0.25
-clen=5
-msg_raz=5
+# hs=((time.time()+3600*9)%86400)//3600
+# ms=((time.time())%3600)//60+1
+# interv=0.25
+# clen=5
+# msg_raz=5
 v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
