@@ -167,7 +167,8 @@ def record_rank(user,num_ra,v,i):
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
         vc.loc[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
-    vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
+    if  vc.loc[str(user.id),str(i)]==0:
+        vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
     return vc
 
 def perf_calc(db,v):
