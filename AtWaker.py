@@ -266,6 +266,7 @@ async def on_reaction_add(reaction,user):
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
                 print(num_ra,user.display_name)
+                num_ra+=1
                 v=record_rank(user,num_ra,v,i)
                 save_vars()
     return
