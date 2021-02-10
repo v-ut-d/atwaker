@@ -153,7 +153,7 @@ async def contest_end():
             await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
                                                                         +str(len(v))+'人でした。')
             db.loc[dt]=[np.nan for _ in range(len(db.columns))]
-            db=perf_calc(db,v)
+            db=perf_calc(db)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(v)+1)):
@@ -175,7 +175,7 @@ def record_rank(user,num_ra,v,i):
         vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
     return vc
 
-def perf_calc(db,v):
+def perf_calc(db):
     dbc=db.copy()
     global v
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
