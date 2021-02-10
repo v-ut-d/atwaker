@@ -13,7 +13,6 @@ import pickle
 # .envファイルの内容を読み込みます
 # load_dotenv()
 TOKEN = os.environ['TOKEN']
-
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
