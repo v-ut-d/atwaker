@@ -370,7 +370,7 @@ async def on_message(message):
                     a,b=message.content[18:].split()
                     z=max(int(b),1)
                     for rk in range(z-1,min(z-1+min_display,len(dbd.loc[a].dropna()))):
-                        perf=str(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk])
+                        perf=str(int(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk]))
                         userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
                         if guild.get_member(userid)==None:
                             username='[deleted]'
