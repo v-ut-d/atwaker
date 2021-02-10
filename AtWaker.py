@@ -73,8 +73,6 @@ def save_vars():
     vars.to_csv('variables_'+str(serverid)+'.csv')
     v.to_csv('v_'+str(serverid)+'.csv')
 
-
-
 def renew_db(serverid):
     guild=client.get_guild(serverid)
     db=get_cached_df('AtWaker_data_'+str(serverid))
