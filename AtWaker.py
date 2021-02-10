@@ -256,6 +256,7 @@ async def on_ready():
 @client.event
 async def on_reaction_add(reaction,user):
     global v
+    global num_ra
     if (contesting==1) and (user.id!=807869171491668020):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
         for i in range(msg_raz):
