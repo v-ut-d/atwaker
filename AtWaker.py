@@ -85,6 +85,7 @@ def renew_db(serverid):
     for xx in {str(aa.id) for aa in guild.members}-set(dbr.index.astype(str)):
         dbr[xx]=[0 for _ in range(len(dbr))]
     cache_df('AtWaker_rate_'+str(serverid),dbr)
+    print("df renewed")
     
 def make_db(serverid):
     guild=client.get_guild(serverid)
@@ -92,7 +93,8 @@ def make_db(serverid):
     cache_df('AtWaker_data_'+str(serverid),db)
     dbr=pd.DataFrame(columns=[str(xx.id) for xx in guild.members],index=[])
     cache_df('AtWaker_rate_'+str(serverid),dbr)
-    
+    print("df made")
+
 # async def repeat1(start,msg):
 #   while time.time()-start<60*(clen+1):
 #     print('rep1s')
