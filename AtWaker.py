@@ -84,7 +84,7 @@ def renew_db(serverid):
     cache_df('AtWaker_data_'+str(serverid),db)
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
     for xx in {str(aa.id) for aa in guild.members}-set(dbr.index.astype(str)):
-        dbr[xx]=[np.nan for _ in range(len(dbr))]
+        dbr[xx]=[0 for _ in range(len(dbr))]
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     
 def make_db(serverid):
@@ -357,7 +357,8 @@ async def on_message(message):
                             elif len(dbd[str(userid)].dropna())<14:
                                 zant="(暫定)"
                             await channel.send(str(rk+1)+'位:'+username+' '+rate+zant)
-                    except:
+                    except Exception as e:
+                        print(e)
                         await channel.send('引数が不正です。')
                 else:
                     await channel.send('まだコンテストが開催されていません。')
@@ -377,7 +378,8 @@ async def on_message(message):
                         else:
                             username=guild.get_member(userid).display_name
                         await channel.send(str(rk+1)+'位:'+username+' '+perf)
-                except:
+                except Exception as e:
+                    print(e)
                     await channel.send('引数が不正です。')
             else:
                 await channel.send('初めに!atw start (絵文字)を実行してください。')
