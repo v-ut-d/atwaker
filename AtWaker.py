@@ -45,8 +45,6 @@ def cache_df(alias,df):
     if res == True:
         print('df cached')
 
-
-
 def get_cached_df(alias):
     data = conn.get(alias)
     try:
@@ -165,6 +163,7 @@ async def contest_end():
     cache_df('AtWaker_data_'+str(serverid),db)
     return
     
+
 def record_rank(user,num_ra,v,i):
     vc=v.copy()
     if not (str(user.id) in vc.index):
