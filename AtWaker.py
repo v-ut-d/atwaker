@@ -407,7 +407,7 @@ async def loop():
         await contest()
     for i in range(msg_raz):
         if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
-            contest_msg(i)
+            await contest_msg(i)
     if(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
         await contest_end()
     return
