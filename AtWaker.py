@@ -130,13 +130,15 @@ async def contest():
     global contesting
     contesting=1
     save_vars()
+    await contest_msg(0)
+    print('Contest started')
+    return
     
 async def contest_msg(i):
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt+' '+str(i+1)+'回目')    
     await msg.add_reaction(emoji=emj)
-    print('Contest started')
-    
+    return
     
 async def contest_end():
     print('Contest ended')
@@ -405,11 +407,13 @@ async def loop():
     print(bool1l ,bool2l ,bool3l,bool4l,bool5l,bool6l)
     if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
-    for i in range(msg_raz):
-        if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
-            await contest_msg(i)
-    if(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
+    elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
         await contest_end()
+    else:
+        for i in range(1,msg_raz):
+            if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
+                await contest_msg(i)
+    
     return
 
 #変数読み込み
