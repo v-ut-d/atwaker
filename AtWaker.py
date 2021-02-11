@@ -158,8 +158,8 @@ async def contest_end():
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
-                await channel.send(str(j)+'位:'+jthuser.display_name+' '
-                                    +vs.iloc[j-1].loc['time']+' パフォーマンス:'
+                await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
+                                    +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
                                     +str((int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],int) else db.loc[dt,vs.index[j-1]])))
     else:
         await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
