@@ -17,7 +17,7 @@ intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
 channelid=int(os.environ['CHANNEL'])
-# channelid=805226148195074089
+channelid=805226148195074089
 serverid=int(os.environ['SERVER'])
 thisbotid=int(os.environ['THISBOT'])
 print(client.get_channel(channelid))
