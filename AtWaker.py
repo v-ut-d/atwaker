@@ -435,6 +435,7 @@ async def loop():
 load_vars()
 
 v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+v.index=v.index.astype(str)
 dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
 emj=dbv.loc['emj','variables']
 contesting=int(dbv.loc['contesting','variables'])
