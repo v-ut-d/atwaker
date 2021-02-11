@@ -216,14 +216,14 @@ def perf_calc(db):
         user=str(user)
         past=dbc[user].dropna().values[::-1]
         if(len(past)==0):
-            aperf.loc[user]=1200
+            aperf.at[user]=1200
         else:
             aperfnom=0
             aperfden=0
             for i in range(len(past)):
                 aperfnom+=past[i]*(0.9**(i+1))
                 aperfden+=0.9**(i+1)
-            aperf.loc[user]=aperfnom/aperfden
+            aperf.at[user]=aperfnom/aperfden
     xx=-int(800*np.log(len(vc))/np.log(6))
     s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
@@ -232,12 +232,12 @@ def perf_calc(db):
         while s>=j+0.5:
             xx+=1
             s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
-        dbc.iloc[-1].loc[vc.index[j]]=int(xx)
+        dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
     if len(dbc)==1:
         dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
     for j in range(len(vc))[::-1]:
-        if dbc.iloc[-1].loc[vc.index[j]]<=400:
-            dbc.iloc[-1].loc[vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
+        if dbc.at[dbc.index[-1],vc.index[j]]<=400:
+            dbc.at[dbc.index[-1],vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
     cache_df('AtWaker_data_'+str(serverid),dbc)
     return 
 
@@ -261,7 +261,7 @@ def rate_calc(db,dt):
             rate=800*np.log(ratenom/rateden)/np.log(2)-corr
             if rate<=400:
                 rate=400*np.e**(rate/400-1)
-            dbr.loc[dt,xx]=int(rate+0.5)
+            dbr.at[dt,xx]=int(rate+0.5)
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     return
 
