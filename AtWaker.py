@@ -144,6 +144,8 @@ async def contest_end():
     channel = client.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     global contesting
+    global num_ra
+    global v
     contesting=0
     save_vars()
     if num_ra>0:
