@@ -36,7 +36,7 @@ v=None
 emj='<:ohayo:805676181328232448>'
 contesting=0
 num_ra=0
-min_display=20
+min_display=10
 conn=r.connect()
 
 def cache_df(alias,df):
