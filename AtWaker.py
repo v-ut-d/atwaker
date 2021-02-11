@@ -151,6 +151,7 @@ async def contest_end():
                                                                         +str(len(v.dropna()))+'人でした。')
             db.loc[dt]=[np.nan for _ in range(len(db.columns))]
             perf_calc(db)
+            db=get_cached_df('AtWaker_data_'+str(serverid))
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
@@ -187,6 +188,7 @@ def perf_calc(db):
     print(v)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
     for user in vc.index:
+        user=str(user)
         past=dbc[user].dropna().values[::-1]
         if(len(past)==0):
             aperf[user]=1200
