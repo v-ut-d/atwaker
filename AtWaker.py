@@ -397,7 +397,7 @@ async def on_message(message):
         # elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
         #     global num_ra
         #     num_ra=1
-            await contest_end()
+        #     await contest_end()
         else:
             await channel.send('そのコマンドは存在しません。')
     return 
