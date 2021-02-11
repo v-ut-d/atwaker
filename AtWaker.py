@@ -122,7 +122,7 @@ async def contest():
     start=time.time()
     msg=await channel.send('おはようございます！ Good morning!\n'+dt
                             +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+'」の\nメッセージに'
-                            +emj+'でリアクションしてね。')
+                            +emj+'でリアクションしてね。徹夜勢の参加は禁止です。一度寝てから出直してください。')
     global contesting
     contesting=1
     save_vars()
