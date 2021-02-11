@@ -1,1 +1,1 @@
-AtWaker: python AtWaker/AtWaker.py
+web: python AtWaker.py
