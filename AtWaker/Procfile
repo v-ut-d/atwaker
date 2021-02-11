@@ -1,2 +1,1 @@
-web: cd AtWaker
-web: python AtWaker.py
+AtWaker: python AtWaker.py
