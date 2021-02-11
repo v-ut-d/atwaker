@@ -56,7 +56,7 @@ def get_cached_df(alias):
 
 def load_vars():
     global v
-    dbv=get_cached_df('variables_'+str(serverid),)
+    dbv=get_cached_df('variables_'+str(serverid))
     v=get_cached_df('v_'+str(serverid))
     global emj
     global contesting
