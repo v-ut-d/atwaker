@@ -108,7 +108,6 @@ def make_db(serverid):
 #   await asyncio.sleep(60*clen)
 #   print('rep2')
 #   await msg.add_reaction(emoji=emj2)
-
     
 async def contest():
     channel = client.get_channel(channelid)
