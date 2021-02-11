@@ -360,6 +360,28 @@ async def on_message(message):
                         else:
                             rate=0
                             zant="(未参加)"
+                        try:
+                            if rate>=2800:
+                                color='\U0001f534'
+                            elif rate>=2400:
+                                color='\U0001f7e0'
+                            elif rate>=2000:
+                                color='\U0001f7e1'
+                            elif rate>=1600:
+                                color='\U0001f7e3'
+                            elif rate>=1200:
+                                color='\U0001f535'
+                            elif rate>=800:
+                                color='\U0001f7e2'
+                            elif rate>=400:
+                                color='\U0001f7e4'
+                            elif rate>=0:
+                                color='\U000026aa'
+                            else:
+                                color=""
+                        except Exception as e:
+                            print(e)
+                            color=""
                         await channel.send(xx.display_name+':'+str(rate)+zant)
                 if num==0:
                     await channel.send('ユーザーが見つかりません。')
