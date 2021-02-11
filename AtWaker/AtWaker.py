@@ -22,11 +22,11 @@ serverid=int(os.environ['SERVER'])
 thisbotid=int(os.environ['THISBOT'])
 print(client.get_channel(channelid))
 z=86400*((365.25*50)//1+5/8)//1
-hs=6
-ms=0
+hs=7
+ms=30
 interv=1
 clen=360
-msg_raz=6
+msg_raz=1
 # hs=((time.time()+3600*9)%86400)//3600
 # ms=((time.time())%3600)//60+1
 # interv=0.25
@@ -122,7 +122,7 @@ async def contest():
     save_vars()
     start=time.time()
     msg=await channel.send('おはようございます！ Good morning!\n'+dt
-                            +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+' 〇回目」の\nメッセージに'
+                            +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+'」の\nメッセージに'
                             +emj+'でリアクションしてね。')
     global contesting
     contesting=1
@@ -134,7 +134,7 @@ async def contest():
 async def contest_msg(i):
     channel = client.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
-    msg=await channel.send(dt+' '+str(i+1)+'回目')    
+    msg=await channel.send(dt)    
     await msg.add_reaction(emoji=emj)
     return
     
@@ -150,7 +150,7 @@ async def contest_end():
     save_vars()
     if num_ra>0:
             await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
-                                                                        +str(len(v.dropna()))+'人でした。')
+                                +str(len(v.dropna()))+'人でした。')
             db.loc[dt]=[np.nan for _ in range(len(db.columns))]
             perf_calc(db)
             db=get_cached_df('AtWaker_data_'+str(serverid))
@@ -158,9 +158,32 @@ async def contest_end():
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
+                perf=int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],int) else db.loc[dt,vs.index[j-1]]
+                try:
+                    if perf>=2800:
+                        color='\U0001f534'
+                    elif perf>=2400:
+                        color='\U0001f7e0'
+                    elif perf>=2000:
+                        color='\U0001f7e1'
+                    elif perf>=1600:
+                        color='\U0001f7e3'
+                    elif perf>=1200:
+                        color='\U0001f535'
+                    elif perf>=800:
+                        color='\U0001f7e2'
+                    elif perf>=400:
+                        color='\U0001f7e4'
+                    elif perf>=0:
+                        color='\U000026aa'
+                    else:
+                        color=""
+                except Exception as e:
+                    print(e)
+                    color=""
                 await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
                                     +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
-                                    +str((int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],int) else db.loc[dt,vs.index[j-1]])))
+                                    +str(perf)+color)
     else:
         await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
 
@@ -272,7 +295,7 @@ async def on_reaction_add(reaction,user):
             bool1=(str(reaction.emoji)==str(emj))
             bool2=(reaction.message.author.id==807869171491668020) 
             # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
-            bool3=(reaction.message.content==dt+' '+str(i+1)+'回目')
+            bool3=(reaction.message.content==dt)
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
                 print(num_ra,user.display_name)
@@ -362,7 +385,29 @@ async def on_message(message):
                                 zant="(未参加)"
                             elif len(dbd[str(userid)].dropna())<14:
                                 zant="(暫定)"
-                            await channel.send(str(rk+1)+'位:'+username+' '+rate+zant)
+                            try:
+                                if rate>=2800:
+                                    color='\U0001f534'
+                                elif rate>=2400:
+                                    color='\U0001f7e0'
+                                elif rate>=2000:
+                                    color='\U0001f7e1'
+                                elif rate>=1600:
+                                    color='\U0001f7e3'
+                                elif rate>=1200:
+                                    color='\U0001f535'
+                                elif rate>=800:
+                                    color='\U0001f7e2'
+                                elif rate>=400:
+                                    color='\U0001f7e4'
+                                elif rate>=0:
+                                    color='\U000026aa'
+                                else:
+                                    color=""
+                            except Exception as e:
+                                print(e)
+                                color=""
+                            await channel.send(str(rk+1)+'位:'+username+' '+rate+color+zant)
                     except Exception as e:
                         print(e)
                         await channel.send('引数が不正です。')
@@ -383,7 +428,29 @@ async def on_message(message):
                             username='[deleted]'
                         else:
                             username=guild.get_member(userid).display_name
-                        await channel.send(str(rk+1)+'位:'+username+' '+perf)
+                        try:
+                            if perf>=2800:
+                                color='\U0001f534'
+                            elif perf>=2400:
+                                color='\U0001f7e0'
+                            elif perf>=2000:
+                                color='\U0001f7e1'
+                            elif perf>=1600:
+                                color='\U0001f7e3'
+                            elif perf>=1200:
+                                color='\U0001f535'
+                            elif perf>=800:
+                                color='\U0001f7e2'
+                            elif perf>=400:
+                                color='\U0001f7e4'
+                            elif perf>=0:
+                                color='\U000026aa'
+                            else:
+                                color=""
+                        except Exception as e:
+                            print(e)
+                            color=""
+                        await channel.send(str(rk+1)+'位:'+username+' '+perf+color)
                 except Exception as e:
                     print(e)
                     await channel.send('引数が不正です。')
@@ -426,11 +493,10 @@ async def loop():
         await contest()
     elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
         await contest_end()
-    else:
-        for i in range(1,msg_raz):
-            if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
-                await contest_msg(i)
-    
+    # else:
+    #     for i in range(1,msg_raz):
+    #         if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
+    #             await contest_msg(i)
     return
 
 #変数読み込み
