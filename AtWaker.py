@@ -382,7 +382,7 @@ async def on_message(message):
                         except Exception as e:
                             print(e)
                             color=""
-                        await channel.send(xx.display_name+':'+str(rate)+zant)
+                        await channel.send(xx.display_name+':'+str(rate)+color+zant)
                 if num==0:
                     await channel.send('ユーザーが見つかりません。')
             else:
