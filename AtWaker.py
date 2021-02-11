@@ -153,7 +153,7 @@ async def contest_end():
             db=perf_calc(db)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
-            for j in range(1,min(min_display+1,len(v)+1)):
+            for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
                 await channel.send(str(j)+'位:'+jthuser.display_name+' '
                                                                                 +vs.iloc[j-1].loc['time']+' パフォーマンス:'
@@ -386,6 +386,8 @@ async def on_message(message):
             helpstr = f.read()
             f.close()
             await channel.send(helpstr)
+        elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
+            await contest_end()
         else:
             await channel.send('そのコマンドは存在しません。')
     return 
