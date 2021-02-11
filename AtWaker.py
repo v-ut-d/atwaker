@@ -186,19 +186,20 @@ def perf_calc(db):
     save_vars()
     vc=v['rank']
     print(v)
+    print(vc)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
     for user in vc.index:
         user=str(user)
         past=dbc[user].dropna().values[::-1]
         if(len(past)==0):
-            aperf[user]=1200
+            aperf.loc[user]=1200
         else:
             aperfnom=0
             aperfden=0
             for i in range(len(past)):
                 aperfnom+=past[i]*(0.9**(i+1))
                 aperfden+=0.9**(i+1)
-            aperf[user]=aperfnom/aperfden
+            aperf.loc[user]=aperfnom/aperfden
     xx=-int(800*np.log(len(vc))/np.log(6))
     s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
@@ -431,14 +432,13 @@ async def loop():
     return
 
 #変数読み込み
-if isinstance(get_cached_df('v_'+str(serverid)),pd.DataFrame) and isinstance(get_cached_df('variables_'+str(serverid)),pd.DataFrame):
-    load_vars()
-else:
-    v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
-    dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
-    emj=dbv.loc['emj','variables']
-    contesting=int(dbv.loc['contesting','variables'])
-    num_ra=int(dbv.loc['num_ra','variables'])
+load_vars()
+
+v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
+emj=dbv.loc['emj','variables']
+contesting=int(dbv.loc['contesting','variables'])
+num_ra=int(dbv.loc['num_ra','variables'])
 
 #ループ処理実行
 loop.start()
