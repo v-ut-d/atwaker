@@ -394,9 +394,9 @@ async def on_message(message):
             helpstr = f.read()
             f.close()
             await channel.send(helpstr)
-        elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
-            global num_ra
-            num_ra=1
+        # elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
+        #     global num_ra
+        #     num_ra=1
             await contest_end()
         else:
             await channel.send('そのコマンドは存在しません。')
@@ -436,12 +436,12 @@ async def loop():
 #変数読み込み
 load_vars()
 
-v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
-v.index=v.index.astype(str)
-dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
-emj=dbv.loc['emj','variables']
-contesting=int(dbv.loc['contesting','variables'])
-num_ra=int(dbv.loc['num_ra','variables'])
+# v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+# v.index=v.index.astype(str)
+# dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
+# emj=dbv.loc['emj','variables']
+# contesting=int(dbv.loc['contesting','variables'])
+# num_ra=int(dbv.loc['num_ra','variables'])
 
 #ループ処理実行
 loop.start()
