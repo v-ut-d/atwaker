@@ -56,8 +56,8 @@ def get_cached_df(alias):
 
 def load_vars():
     global v
-    dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
-    v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+    dbv=get_cached_df('variables_'+str(serverid),)
+    v=get_cached_df('v_'+str(serverid))
     global emj
     global contesting
     global num_ra
@@ -68,8 +68,8 @@ def load_vars():
 
 def save_vars():
     vars=pd.DataFrame([[str(emj)],[num_ra],[contesting]],index=['emj','num_ra','contesting'],columns=['variables'])
-    vars.to_csv('variables_'+str(serverid)+'.csv')
-    v.to_csv('v_'+str(serverid)+'.csv')
+    cache_df("variables_"+str(serverid),vars)
+    cache_df("v_"+str(serverid),v)
 
 def renew_db(serverid):
     guild=client.get_guild(serverid)
@@ -148,30 +148,33 @@ async def contest_end():
     save_vars()
     if num_ra>0:
             await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
-                                                                        +str(len(v))+'人でした。')
+                                                                        +str(len(v.dropna()))+'人でした。')
             db.loc[dt]=[np.nan for _ in range(len(db.columns))]
-            db=perf_calc(db)
+            perf_calc(db)
             rate_calc(db,dt)
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
                 await channel.send(str(j)+'位:'+jthuser.display_name+' '
-                                                                                +vs.iloc[j-1].loc['time']+' パフォーマンス:'
-                                                                                +str(int(db.loc[dt,vs.index[j-1]])))
+                                    +vs.iloc[j-1].loc['time']+' パフォーマンス:'
+                                    +str((int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],int) else db.loc[dt,vs.index[j-1]])))
     else:
         await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
-    cache_df('AtWaker_data_'+str(serverid),db)
+
     return
     
 
-def record_rank(user,num_ra,v,i):
+def record_rank(user,i):
+    global v
     vc=v.copy()
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
         vc.loc[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
     if  vc.loc[str(user.id),str(i)]==0:
         vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
-    return vc
+    v=vc
+    save_vars()
+    return 
 
 def perf_calc(db):
     dbc=db.copy()
@@ -181,7 +184,7 @@ def perf_calc(db):
     v['rank']=list(range(1,len(v)+1))
     save_vars()
     vc=v['rank']
-    print(vc)
+    print(v)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
     for user in vc.index:
         past=dbc[user].dropna().values[::-1]
@@ -208,7 +211,8 @@ def perf_calc(db):
     for j in range(len(vc))[::-1]:
         if dbc.iloc[-1].loc[vc.index[j]]<=400:
             dbc.iloc[-1].loc[vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
-    return dbc
+    cache_df('AtWaker_data_'+str(serverid),dbc)
+    return 
 
 def rate_calc(db,dt):
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
@@ -268,8 +272,7 @@ async def on_reaction_add(reaction,user):
             if bool1 and bool2 and bool3:
                 print(num_ra,user.display_name)
                 num_ra+=1
-                v=record_rank(user,num_ra,v,i)
-                save_vars()
+                record_rank(user,i)
     return
     
 
@@ -387,6 +390,8 @@ async def on_message(message):
             f.close()
             await channel.send(helpstr)
         elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
+            global num_ra
+            num_ra=1
             await contest_end()
         else:
             await channel.send('そのコマンドは存在しません。')
@@ -424,7 +429,14 @@ async def loop():
     return
 
 #変数読み込み
-load_vars()
+if isinstance(get_cached_df('v_'+str(serverid)),pd.DataFrame) and isinstance(get_cached_df('variables_'+str(serverid)),pd.DataFrame):
+    load_vars()
+else:
+    v=pd.read_csv('v_'+str(serverid)+'.csv',header=0,index_col=0)
+    dbv=pd.read_csv('variables_'+str(serverid)+'.csv',header=0,index_col=0)
+    emj=dbv.loc['emj','variables']
+    contesting=int(dbv.loc['contesting','variables'])
+    num_ra=int(dbv.loc['num_ra','variables'])
 
 #ループ処理実行
 loop.start()
