@@ -1,1 +1,2 @@
+web: cd AtWaker
 web: python AtWaker.py
