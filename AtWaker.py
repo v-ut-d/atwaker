@@ -157,7 +157,7 @@ async def contest_end():
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
-                perf=int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],int) else db.loc[dt,vs.index[j-1]]
+                perf=int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],np.int64) else db.loc[dt,vs.index[j-1]]
                 try:
                     if perf>=2800:
                         color='\U0001f534'
@@ -395,7 +395,7 @@ async def on_message(message):
                     try:
                         z=max(int(message.content[20:]),1)
                         for rk in range(z-1,min(z-1+min_display,len(dbr.iloc[-1]))):
-                            rate=str(int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk]))
+                            rate=int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
                             userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
                             zant=""
                             if guild.get_member(userid)==None:
@@ -428,7 +428,7 @@ async def on_message(message):
                             except Exception as e:
                                 print(e)
                                 color=""
-                            await channel.send(str(rk+1)+'位:'+username+' '+rate+color+zant)
+                            await channel.send(str(rk+1)+'位:'+username+' '+str(rate)+color+zant)
                     except Exception as e:
                         print(e)
                         await channel.send('引数が不正です。')
@@ -443,7 +443,7 @@ async def on_message(message):
                     a,b=message.content[18:].split()
                     z=max(int(b),1)
                     for rk in range(z-1,min(z-1+min_display,len(dbd.loc[a].dropna()))):
-                        perf=str(int(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk]))
+                        perf=int(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk])
                         userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
                         if guild.get_member(userid)==None:
                             username='[deleted]'
@@ -471,7 +471,7 @@ async def on_message(message):
                         except Exception as e:
                             print(e)
                             color=""
-                        await channel.send(str(rk+1)+'位:'+username+' '+perf+color)
+                        await channel.send(str(rk+1)+'位:'+username+' '+str(perf)+color)
                 except Exception as e:
                     print(e)
                     await channel.send('引数が不正です。')
