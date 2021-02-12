@@ -17,7 +17,7 @@ intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
 channelid=int(os.environ['CHANNEL'])
-# channelid=805226148195074089
+channelid=805767047900168223
 serverid=int(os.environ['SERVER'])
 thisbotid=int(os.environ['THISBOT'])
 print(client.get_channel(channelid))
@@ -194,9 +194,9 @@ def record_rank(user,i):
     vc=v.copy()
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
-        vc.loc[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
+        vc.at[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
     if  vc.loc[str(user.id),str(i)]==0:
-        vc.loc[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
+        vc.at[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
     v=vc
     save_vars()
     return 
@@ -204,6 +204,7 @@ def record_rank(user,i):
 def perf_calc(db):
     dbc=db.copy()
     global v
+    dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
     v['rank']=list(range(1,len(v)+1))
@@ -236,8 +237,8 @@ def perf_calc(db):
     if len(dbc)==1:
         dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
     for j in range(len(vc))[::-1]:
-        if dbc.at[dbc.index[-1],vc.index[j]]<=400:
-            dbc.at[dbc.index[-1],vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
+        if dbc.at[dt,vc.index[j]]<=400:
+            dbc.at[dt,vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
     cache_df('AtWaker_data_'+str(serverid),dbc)
     return 
 
@@ -297,8 +298,8 @@ async def on_reaction_add(reaction,user):
             bool3=(reaction.message.content==dt)
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
-                print(num_ra,user.display_name)
                 num_ra+=1
+                print(num_ra,user.display_name)
                 record_rank(user,i)
     return
     
@@ -482,10 +483,10 @@ async def on_message(message):
             helpstr = f.read()
             f.close()
             await channel.send(helpstr)
-        # elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
-        #     global num_ra
-        #     num_ra=1
-        #     await contest_end()
+        elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
+            global num_ra
+            num_ra=1
+            await contest_end()
         else:
             await channel.send('そのコマンドは存在しません。')
     return 
