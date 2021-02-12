@@ -144,6 +144,7 @@ async def contest_msg(i):
     await msg.add_reaction(emoji=emj)
     global msg_id
     msg_id=msg.id
+    save_vars()
     return
     
 async def contest_end():
