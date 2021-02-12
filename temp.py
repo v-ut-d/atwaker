@@ -31,6 +31,7 @@ emj='<:ohayo:805676181328232448>'
 contesting=0
 num_ra=0
 serverid=805058528485965894
+msg_id=809914450052251648
 conn=connect()
 
 def cache_df(alias,df):
@@ -56,39 +57,50 @@ def load_vars():
     global emj
     global contesting
     global num_ra
-    emj=dbv.loc['emj','variables']
-    contesting=int(dbv.loc['contesting','variables'])
-    num_ra=int(dbv.loc['num_ra','variables'])
+    global msg_id
+    if 'emj' in dbv.index:
+        emj=dbv.loc['emj','variables']
+    if 'contesting' in dbv.index:
+        contesting=int(dbv.loc['contesting','variables'])
+    if 'num_ra' in dbv.index:
+        num_ra=int(dbv.loc['num_ra','variables'])
+    if 'msg_id' in dbv.index:
+        msg_id=int(dbv.loc['msg_id','variables'])
     return
 
 def save_vars():
-    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting]],index=['emj','num_ra','contesting'],columns=['variables'])
+    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting],[msg_id]],index=['emj','num_ra','contesting','msg_id'],columns=['variables'])
     cache_df("variables_"+str(serverid),vars)
     cache_df("v_"+str(serverid),v)
 
-
 load_vars()
 
-v.loc['805344121186418689']=[12,'09:00:00',10800,10800]
-v.loc['520272215451893782']=[13,'09:00:00',10800,10800]
-v.loc['536764455573389313']=[14,'09:00:00',10800,10800]
-v.loc['805053220325425172']=[15,'09:00:00',10800,10800]
-v.loc['762947104490258462']=[16,'09:00:00',10800,10800]
-v.loc['700239494867058711']=[17,'09:00:00',10800,10800]
-v.loc['524208211365068833']=[18,'09:00:00',10800,10800]
-v.loc['706391069599727657']=[19,'09:00:00',10800,10800]
-v.loc['636201619914096670']=[20,'09:00:00',10800,10800]
-v.loc['501260547518627850']=[21,'09:00:00',10800,10800]
+v.loc['564310525715021835']=[1,'07:30:52',16148,0]
+v.loc['351001323920949249']=[2,'07:31:15',16125,0]
+v.loc['805053220325425172']=[3,'07:32:03',16077,0]
+v.loc['242660319011405824']=[4,'07:38:13',15707,0]
+v.loc['602203895464329216']=[5,'07:44:22',15338,0]
+v.loc['805354010252017695']=[6,'07:52:14',14866,0]
+v.loc['706391069599727657']=[7,'07:58:01',14519,0]
+v.loc['581807612861874207']=[8,'08:01:13',14327,0]
+v.loc['762947104490258462']=[9,'08:01:40',14300,0]
+v.loc['698529378027569235']=[10,'08:01:50',14299,0]
+v.loc['805344121186418689']=[11,'08:02:00',14280,0]
+v.loc['794496518127747074']=[12,'08:03:09',14211,0]
+v.loc['686197652328546428']=[13,'08:07:51',13929,0]
+
 print(v)
 
-db=get_cached_df("AtWaker_data_"+str(serverid))
-dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
-dbr=get_cached_df("AtWaker_rate_"+str(serverid))
-if dt in db.index:
-    db=db.drop(dt, axis=0)
-if dt in dbr.index:
-    dbr=dbr.drop(dt,axis=0)
-cache_df("AtWaker_rate_"+str(serverid),dbr)
+save_vars()
+
+# db=get_cached_df("AtWaker_data_"+str(serverid))
+# dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
+# dbr=get_cached_df("AtWaker_rate_"+str(serverid))
+# if dt in db.index:
+#     db=db.drop(dt, axis=0)
+# if dt in dbr.index:
+#     dbr=dbr.drop(dt,axis=0)
+# cache_df("AtWaker_rate_"+str(serverid),dbr)
 
 def perf_calc(db):
     dbc=db.copy()
@@ -156,8 +168,8 @@ def rate_calc(db,dt):
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     return
 
-perf_calc(db)
-db=get_cached_df("AtWaker_data_"+str(serverid))
-rate_calc(db,dt)
-print(get_cached_df("AtWaker_data_"+str(serverid)).T.dropna(axis=0,how="all").sort_values(by=dt).head(40))
-print(get_cached_df("AtWaker_rate_"+str(serverid)).T.sort_values(by=dt,ascending=False).head(40))
+# perf_calc(db)
+# db=get_cached_df("AtWaker_data_"+str(serverid))
+# rate_calc(db,dt)
+# print(get_cached_df("AtWaker_data_"+str(serverid)).T.dropna(axis=0,how="all").sort_values(by=dt).head(40))
+# print(get_cached_df("AtWaker_rate_"+str(serverid)).T.sort_values(by=dt,ascending=False).head(40))

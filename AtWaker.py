@@ -300,8 +300,9 @@ async def on_raw_reaction_add(payload):
     global v
     global num_ra
     guild=client.get_guild(serverid)
+    channel = client.get_channel(channelid)
     user=guild.get_member(payload.user_id)
-    msg=guild.get_message(payload.message_id)
+    msg=channel.fetch_message(payload.message_id)
     print((contesting==1) , (user.id!=thisbotid))
     if (contesting==1) and (user.id!=thisbotid):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
