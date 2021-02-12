@@ -297,6 +297,7 @@ async def on_raw_reaction_add(payload):
     guild=client.get_guild(serverid)
     user=guild.get_member(payload.user_id)
     msg=guild.get_message(payload.message_id)
+    print((contesting==1) , (user.id!=thisbotid))
     if (contesting==1) and (user.id!=thisbotid):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
         for i in range(msg_raz):
