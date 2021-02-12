@@ -26,7 +26,7 @@ hs=7
 ms=30
 interv=1
 clen=270
-msg_id=None
+msg_id=809551971585359912
 msg_raz=1
 # hs=((time.time()+3600*9)%86400)//3600
 # ms=((time.time())%3600)//60+1
@@ -63,10 +63,14 @@ def load_vars():
     global contesting
     global num_ra
     global msg_id
-    emj=dbv.loc['emj','variables']
-    contesting=int(dbv.loc['contesting','variables'])
-    num_ra=int(dbv.loc['num_ra','variables'])
-    msg_id=int(dbv.loc['msg_id','variables'])
+    if 'emj' in dbv.index:
+        emj=dbv.loc['emj','variables']
+    if 'contesting' in dbv.index:
+        contesting=int(dbv.loc['contesting','variables'])
+    if 'num_ra' in dbv.index:
+        num_ra=int(dbv.loc['num_ra','variables'])
+    if 'msg_id' in dbv.index:
+        msg_id=int(dbv.loc['msg_id','variables'])
     return
 
 def save_vars():
