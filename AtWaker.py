@@ -26,6 +26,7 @@ hs=7
 ms=30
 interv=1
 clen=270
+msg_id=None
 msg_raz=1
 # hs=((time.time()+3600*9)%86400)//3600
 # ms=((time.time())%3600)//60+1
@@ -61,13 +62,15 @@ def load_vars():
     global emj
     global contesting
     global num_ra
+    global msg_id
     emj=dbv.loc['emj','variables']
     contesting=int(dbv.loc['contesting','variables'])
     num_ra=int(dbv.loc['num_ra','variables'])
+    num_ra=int(dbv.loc['msg_id','variables'])
     return
 
 def save_vars():
-    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting]],index=['emj','num_ra','contesting'],columns=['variables'])
+    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting],[msg_id]],index=['emj','num_ra','contesting','msg_id'],columns=['variables'])
     cache_df("variables_"+str(serverid),vars)
     cache_df("v_"+str(serverid),v)
 
@@ -95,7 +98,7 @@ def make_db(serverid):
 #   while time.time()-start<60*(clen+1):
 #     print('rep1s')
 #     reaction, user = await client.wait_for('reaction_add', check=lambda r, u: 
-#                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u.id==807869171491668020))))
+#                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u.id==thisbotid))))
 #     print('rep1')
 #     if r.emoji==emj:
 #       v=record_rank(user,num_ra,v)
@@ -135,6 +138,8 @@ async def contest_msg(i):
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt)    
     await msg.add_reaction(emoji=emj)
+    global msg_id
+    msg_id=msg.id
     return
     
 async def contest_end():
@@ -286,16 +291,19 @@ async def on_ready():
 
 # リアクション受信時に動作する処理
 @client.event
-async def on_reaction_add(reaction,user):
+async def on_raw_reaction_add(payload):
     global v
     global num_ra
-    if (contesting==1) and (user.id!=807869171491668020):
+    guild=client.get_guild(serverid)
+    user=guild.get_member(payload.user_id)
+    msg=guild.get_message(payload.message_id)
+    if (contesting==1) and (user.id!=thisbotid):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
         for i in range(msg_raz):
-            bool1=(str(reaction.emoji)==str(emj))
-            bool2=(reaction.message.author.id==807869171491668020) 
+            bool1=(str(payload.emoji)==str(emj))
+            bool2=(msg.author.id==thisbotid) 
             # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
-            bool3=(reaction.message.content==dt)
+            bool3=(msg.id==msg_id)
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
                 num_ra+=1
