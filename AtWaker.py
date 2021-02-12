@@ -66,7 +66,7 @@ def load_vars():
     emj=dbv.loc['emj','variables']
     contesting=int(dbv.loc['contesting','variables'])
     num_ra=int(dbv.loc['num_ra','variables'])
-    num_ra=int(dbv.loc['msg_id','variables'])
+    msg_id=int(dbv.loc['msg_id','variables'])
     return
 
 def save_vars():
