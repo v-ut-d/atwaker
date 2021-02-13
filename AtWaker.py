@@ -302,7 +302,11 @@ async def on_raw_reaction_add(payload):
     guild=client.get_guild(serverid)
     channel = client.get_channel(channelid)
     user=guild.get_member(payload.user_id)
-    msg=await channel.fetch_message(payload.message_id)
+    try:
+        msg=await channel.fetch_message(payload.message_id)
+    except Exception as e:
+        print(e)
+        return
     print((contesting==1) , (user.id!=thisbotid))
     if (contesting==1) and (user.id!=thisbotid):
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
