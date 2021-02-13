@@ -372,9 +372,9 @@ async def on_message(message):
                     if message.content[12:] in xx.display_name:
                         zant=""
                         num+=1
-                        if len(dbr)>0:
+                        if len(dbd[str(xx.id)].dropna())>0:
                             rate=int(dbr.iloc[-1].loc[str(xx.id)])
-                            if(len(dbd.loc[:,str(xx.id)].dropna())<14):
+                            if(len(dbd[str(xx.id)].dropna())<14):
                                 zant="(暫定)"
                         else:
                             rate=0
