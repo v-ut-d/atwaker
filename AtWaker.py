@@ -369,6 +369,13 @@ async def on_message(message):
                     if message.content[12:] in xx.display_name:
                         zant=""
                         num+=1
+                        try:
+                            if (dbd.iloc[-1].loc[str(xx.id)]==dbd.iloc[-1].loc[str(xx.id)]) and len(dbr)>1:
+                                change=("(+"+str(int(dbr.iloc[-1].loc[str(xx.id)]-dbr.iloc[-2].loc[str(xx.id)]))+")").replace("+-","-")
+                            else:
+                                change="(--)"
+                        except Exception as e:
+                            change=""
                         if len(dbd[str(xx.id)].dropna())>0:
                             rate=int(dbr.iloc[-1].loc[str(xx.id)])
                             if(len(dbd[str(xx.id)].dropna())<14):
@@ -398,7 +405,7 @@ async def on_message(message):
                         except Exception as e:
                             print(e)
                             color=""
-                        await channel.send(xx.display_name+':'+str(rate)+color+zant)
+                        await channel.send(xx.display_name+':'+str(rate)+color+change+zant)
                 if num==0:
                     await channel.send('ユーザーが見つかりません。')
             else:
@@ -423,6 +430,13 @@ async def on_message(message):
                             elif len(dbd[str(userid)].dropna())<14:
                                 zant="(暫定)"
                             try:
+                                if (dbd.iloc[-1].loc[userid]==dbd.iloc[-1].loc[userid]) and len(dbr)>1:
+                                    change=("(+"+str(int(dbr.iloc[-1].loc[str(userid)]-dbr.iloc[-2].loc[str(userid)]))+")").replace("+-","-")
+                                else:
+                                    change="(--)"
+                            except Exception as e:
+                                change=""
+                            try:
                                 if rate>=2800:
                                     color='\U0001f534'
                                 elif rate>=2400:
@@ -444,7 +458,7 @@ async def on_message(message):
                             except Exception as e:
                                 print(e)
                                 color=""
-                            await channel.send(str(rk+1)+'位:'+username+' '+str(rate)+color+zant)
+                            await channel.send(str(rk+1)+'位:'+username+' '+str(rate)+color+change+zant)
                     except Exception as e:
                         print(e)
                         await channel.send('引数が不正です。')
