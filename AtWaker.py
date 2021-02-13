@@ -118,15 +118,13 @@ def make_db(serverid):
 async def contest():
     channel = client.get_channel(channelid)
     global v
-    db=get_cached_df('AtWaker_data_'+str(serverid))
     v=pd.DataFrame(columns=['rank','time']+[str(i) for i in range(msg_raz)]+['total'],index=[])
     save_vars()
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     global num_ra
     num_ra=0
     save_vars()
-    start=time.time()
-    msg=await channel.send('おはようございます！ Good morning!\n'+dt
+    await channel.send('おはようございます！ Good morning!\n'+dt
                             +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+'」の\nメッセージに'
                             +emj+'でリアクションしてね。\n徹夜勢の参加は禁止です。\n一度寝てから出直してください。')
     global contesting
@@ -308,7 +306,6 @@ async def on_raw_reaction_add(payload):
         return
     print((contesting==1) , (user.id!=thisbotid))
     if (contesting==1) and (user.id!=thisbotid):
-        dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
         for i in range(msg_raz):
             bool1=(str(payload.emoji)==str(emj))
             bool2=(msg.author.id==thisbotid) 
