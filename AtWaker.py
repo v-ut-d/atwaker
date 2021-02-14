@@ -375,6 +375,7 @@ async def on_message(message):
                             else:
                                 change="(--)"
                         except Exception as e:
+                            print(e)
                             change=""
                         if len(dbd[str(xx.id)].dropna())>0:
                             rate=int(dbr.iloc[-1].loc[str(xx.id)])
@@ -430,11 +431,12 @@ async def on_message(message):
                             elif len(dbd[str(userid)].dropna())<14:
                                 zant="(暫定)"
                             try:
-                                if (dbd.iloc[-1].loc[userid]==dbd.iloc[-1].loc[userid]) and len(dbr)>1:
+                                if (dbd.iloc[-1].loc[str(userid)]==dbd.iloc[-1].loc[str(userid)]) and len(dbr)>1:
                                     change=("(+"+str(int(dbr.iloc[-1].loc[str(userid)]-dbr.iloc[-2].loc[str(userid)]))+")").replace("+-","-")
                                 else:
                                     change="(--)"
                             except Exception as e:
+                                print(e)
                                 change=""
                             try:
                                 if rate>=2800:
