@@ -198,12 +198,15 @@ async def contest_end():
 
 def record_rank(user,i):
     global v
+    global num_ra
     vc=v.copy()
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
         vc.at[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
     if  vc.loc[str(user.id),str(i)]==0:
+        num_ra+=1
         vc.at[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
+        print(num_ra,user.display_name)
     v=vc
     save_vars()
     return 
@@ -313,8 +316,6 @@ async def on_raw_reaction_add(payload):
             bool3=(msg.id==msg_id)
             print(bool1,bool2,bool3)
             if bool1 and bool2 and bool3:
-                num_ra+=1
-                print(num_ra,user.display_name)
                 record_rank(user,i)
     return
     
