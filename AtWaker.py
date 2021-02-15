@@ -239,7 +239,7 @@ def perf_calc(db):
     s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
-        print(s)
+        print(xx,s)
         while s>=j+0.5:
             xx+=1
             s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
