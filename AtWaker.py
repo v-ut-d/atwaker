@@ -217,7 +217,7 @@ def perf_calc(db):
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
-    v['rank']=list(range(1,len(v)+1))
+    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)+1
     save_vars()
     vc=v['rank']
     print(v)
@@ -240,7 +240,7 @@ def perf_calc(db):
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
         print(xx,s)
-        while s>=j+0.5:
+        while s>=vc[j]-0.5:
             xx+=1
             s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
         dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
