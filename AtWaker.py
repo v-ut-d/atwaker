@@ -223,7 +223,7 @@ def perf_calc(db):
         db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
-    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)+1
+    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)
     # diff=v['rank'].values-np.array(range(len(v)))
     # varp=sum(np.maximum(0,diff)**2)/len(v)
     # varn=sum(np.minimum(0,diff)**2)/len(v)
