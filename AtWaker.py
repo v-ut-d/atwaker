@@ -223,14 +223,14 @@ def perf_calc(db):
         db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
-    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)
-    diff=v['rank'].values-np.array(range(len(v)))
-    varp=sum(np.maximum(0,diff)**2)/len(v)
-    varn=sum(np.minimum(0,diff)**2)/len(v)
-    stdn=(varn/(varp+varn)**0.5)*0.3187
-    stdp=(varp/(varp+varn)**0.5)*0.3187
-    print(stdn,stdp)
-    v['rank']=v['rank']*(len(v)-stdn-stdp)/len(v)+stdn+1
+    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)+1
+    # diff=v['rank'].values-np.array(range(len(v)))
+    # varp=sum(np.maximum(0,diff)**2)/len(v)
+    # varn=sum(np.minimum(0,diff)**2)/len(v)
+    # stdn=(varn/(varp+varn)**0.5)*0.3187
+    # stdp=(varp/(varp+varn)**0.5)*0.3187
+    # print(stdn,stdp)
+    # v['rank']=(v['rank']-1)*(len(v)-stdn-stdp)/len(v)+stdn+1
     save_vars()
     vc=v['rank']
     print(v)
@@ -248,12 +248,16 @@ def perf_calc(db):
                 aperfnom+=past[i]*(0.9**(i+1))
                 aperfden+=0.9**(i+1)
             aperf.at[user]=aperfnom/aperfden
+    aperf=aperf.sort_values(ascending=False)
     xx=-int(800*np.log(len(vc))/np.log(6))
-    s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
+    r0=np.array([0]+list(vc.values-1))
+    rdiff=(r0[1:]-r0[:-1])/2
+    r1=(r0[1:]+r0[:-1])/2
+    s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
         print(xx,s)
-        while s>=vc[j]-0.5:
+        while s>=r1[j]:
             xx+=1
             s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
         dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
