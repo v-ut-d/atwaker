@@ -225,8 +225,9 @@ def perf_calc(db):
     diff=v['rank'].values-np.array(range(len(v)))
     varp=sum(np.maximum(0,diff)**2)/len(v)
     varn=sum(np.minimum(0,diff)**2)/len(v)
-    stdn=(varn/(varp+varn)**0.5)*0.67449
-    stdp=(varp/(varp+varn)**0.5)*0.67449
+    stdn=(varn/(varp+varn)**0.5)*0.3187
+    stdp=(varp/(varp+varn)**0.5)*0.3187
+    print(stdn,stdp)
     v['rank']=v['rank']*(len(v)-stdn-stdp)/len(v)+stdn+1
     save_vars()
     vc=v['rank']
