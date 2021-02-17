@@ -164,7 +164,11 @@ async def contest_end():
             vs=v.dropna().sort_values(by='rank')
             for j in range(1,min(min_display+1,len(vs)+1)):
                 jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
-                perf=int(db.loc[dt,vs.index[j-1]]) if isinstance(db.loc[dt,vs.index[j-1]],np.int64) else db.loc[dt,vs.index[j-1]]
+                try:
+                    perf=int(db.loc[dt,vs.index[j-1]])
+                except Exception as e:
+                    print(j,e)
+                    perf=db.loc[dt,vs.index[j-1]]
                 try:
                     if perf>=2800:
                         color='\U0001f534'
@@ -185,7 +189,7 @@ async def contest_end():
                     else:
                         color=""
                 except Exception as e:
-                    print(e)
+                    print(j,e)
                     color=""
                 await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
                                     +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
@@ -217,7 +221,13 @@ def perf_calc(db):
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
-    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)+1
+    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)
+    diff=v['rank']-np.array(np.range(len(v)))
+    varp=sum(np.maximum(0,diff)**2)/len(v)
+    varn=sum(np.minimum(0,diff)**2)/len(v)
+    stdn=varn/(varp+varn)**0.5
+    stdp=varp/(varp+varn)**0.5
+    v['rank']=v['rank']*(len(v)-stdn-stdp)/len(v)+stdn+1
     save_vars()
     vc=v['rank']
     print(v)
@@ -376,10 +386,14 @@ async def on_message(message):
                             else:
                                 change="(--)"
                         except Exception as e:
-                            print(e)
+                            print(xx.display_name,e)
                             change=""
                         if len(dbd[str(xx.id)].dropna())>0:
-                            rate=int(dbr.iloc[-1].loc[str(xx.id)])
+                            try:
+                                rate=int(dbr.iloc[-1].loc[str(xx.id)])
+                            except Exception as e:
+                                print(xx.display_name,e)
+                                rate=dbr.iloc[-1].loc[str(xx.id)]
                             if(len(dbd[str(xx.id)].dropna())<14):
                                 zant="(暫定)"
                         else:
@@ -420,7 +434,11 @@ async def on_message(message):
                     try:
                         z=max(int(message.content[20:]),1)
                         for rk in range(z-1,min(z-1+min_display,len(dbr.iloc[-1]))):
-                            rate=int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
+                            try:
+                                rate=int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
+                            except Exception as e:
+                                print(rk,e)
+                                rate=dbr.iloc[-1].sort_values(ascending=False).iloc[rk]
                             userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
                             zant=""
                             if guild.get_member(userid)==None:
