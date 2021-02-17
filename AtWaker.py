@@ -223,7 +223,7 @@ def perf_calc(db):
         db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
-    v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)
+    v['rank']=(1-(v['total'].values-1)/(60*clen*(msg_raz+1)/2))*(len(v)-1)
     # diff=v['rank'].values-np.array(range(len(v)))
     # varp=sum(np.maximum(0,diff)**2)/len(v)
     # varn=sum(np.minimum(0,diff)**2)/len(v)
@@ -251,13 +251,13 @@ def perf_calc(db):
     aperf=aperf.sort_values(ascending=False)
     xx=-int(800*np.log(len(vc))/np.log(6))
     r0=np.array([0]+list(vc.values))
-    rdiff=(r0[1:]-r0[:-1])
+    rdiff=r0[1:]-r0[:-1]
     r1=(r0[1:]+r0[:-1])/2
     s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
         print(xx,s)
-        while s>=r1[j]:
+        while s>r1[j]:
             xx+=1
             s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
         dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
