@@ -250,7 +250,7 @@ def perf_calc(db):
             aperf.at[user]=aperfnom/aperfden
     aperf=aperf.sort_values(ascending=False)
     xx=-int(800*np.log(len(vc))/np.log(6))
-    r0=np.array([0]+list(vc.values-1))
+    r0=np.array([0]+list(vc.values))
     rdiff=(r0[1:]-r0[:-1])
     r1=(r0[1:]+r0[:-1])/2
     s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
