@@ -219,6 +219,8 @@ def perf_calc(db):
     dbc=db.copy()
     global v
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
+    if dt in db.index:
+        db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
     v=v.sort_values(by='total',ascending=False)
     v['rank']=(1-v['total'].values/(60*clen*(msg_raz+1)/2))*(len(v)-1)
