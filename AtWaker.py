@@ -259,7 +259,7 @@ def perf_calc(db):
         print(xx,s)
         while s>=r1[j]:
             xx+=1
-            s=np.sum(1/(1+6.0**((xx-aperf.values)/400)))
+            s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
         dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
     if len(dbc)==1:
         dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
