@@ -206,7 +206,7 @@ def record_rank(user,i):
     vc=v.copy()
     if not (str(user.id) in vc.index):
         vc.loc[str(user.id)]=[0]*len(vc.columns)
-        vc.at[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S')
+        vc.at[str(user.id),'time']=(datetime.now()+timedelta(hours=9)).strftime('%H:%M:%S.%f')
     if  vc.loc[str(user.id),str(i)]==0:
         num_ra+=1
         vc.at[str(user.id),str(i)]=(3600*(hs-9)+60*(ms+clen)+86400-time.time()%86400)%86400
