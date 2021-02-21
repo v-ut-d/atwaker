@@ -25,6 +25,8 @@ hs=7
 ms=30
 interv=1
 clen=270
+hgn=23
+mgn=0
 msg_id=809551971585359912
 msg_raz=1
 # hs=((time.time()+3600*9)%86400)//3600
@@ -572,6 +574,9 @@ async def loop():
         await contest()
     elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
         await contest_end()
+    elif(3600*hgn+60*mgn-300*interv<=now<3600*hgn+60*mgn-240*interv):
+        channel = client.get_channel(channelid)
+        await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
     # else:
     #     for i in range(1,msg_raz):
     #         if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
