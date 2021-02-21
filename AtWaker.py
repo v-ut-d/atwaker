@@ -347,7 +347,7 @@ async def on_message(message):
     # if not contesting:
         # serverid=message.channel.guild.id
         # channelid=message.channel.id
-    channel = client.get_channel(channelid)
+    channel = message.channel
     guild=client.get_guild(serverid)
     if message.content.startswith("!atw ") and (message.author.id!=thisbotid):
         if message.content.startswith("!atw start "):
