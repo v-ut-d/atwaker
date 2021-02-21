@@ -384,8 +384,8 @@ async def on_message(message):
                 dbr=get_cached_df('AtWaker_rate_'+str(serverid))
                 dbd=get_cached_df('AtWaker_data_'+str(serverid))
                 num=0
-                print(len(channel.guild.members))
-                for xx in channel.guild.members:
+                print(len(guild.members))
+                for xx in guild.members:
                     if message.content[12:] in xx.display_name:
                         zant=""
                         num+=1
