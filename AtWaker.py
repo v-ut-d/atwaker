@@ -146,11 +146,10 @@ async def contest_msg(i):
     save_vars()
     return
     
-async def contest_end():
+async def contest_end(dt):
     print('Contest ended')
     db=get_cached_df('AtWaker_data_'+str(serverid))
     channel = client.get_channel(channelid)
-    dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     global contesting
     global num_ra
     global v
@@ -543,10 +542,11 @@ async def on_message(message):
             helpstr = f.read()
             f.close()
             await channel.send(helpstr)
-        elif (message.content=="!atw contest_end") and (message.author.id==602203895464329216):
+        elif (message.content.startswith("!atw contest_end ")) and (message.author.id==602203895464329216):
             global num_ra
             num_ra=1
-            await contest_end()
+            dt=message.content[17:]
+            await contest_end(dt)
         else:
             await channel.send('そのコマンドは存在しません。')
     return 
@@ -574,7 +574,8 @@ async def loop():
     if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
     elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
-        await contest_end()
+        dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
+        await contest_end(dt)
     elif(3600*hgn+60*mgn-300*interv<=now<3600*hgn+60*mgn-240*interv):
         channel = client.get_channel(channelid)
         await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
