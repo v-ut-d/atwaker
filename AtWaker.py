@@ -219,7 +219,6 @@ def record_rank(user,i):
 def perf_calc(db,dt):
     dbc=db.copy()
     global v
-    dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     if dt in db.index:
         db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
