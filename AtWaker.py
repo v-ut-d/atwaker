@@ -254,7 +254,7 @@ def perf_calc(db):
     xx=-int(800*np.log(len(vc))/np.log(6))
     r0=np.array([0]+list(vc.values))
     rdiff=r0[1:]-r0[:-1]
-    r1=r0[1:]-min(rdiff)/2+max(rdiff[1],0.01)
+    r1=r0[1:]-min(rdiff)/2+max(rdiff[1],0.000001)
     s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
     print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
