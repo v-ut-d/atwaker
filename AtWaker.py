@@ -297,7 +297,7 @@ def rate_calc(db,dt):
             # dbr.at[dt,xx]=int(rate+0.5)
         if True:
             vperf=(db[xx].values*timelapse)[::-1]
-            vperf=vperf[numpy.logical_not(numpy.isnan(vperf))]
+            vperf=vperf[np.logical_not(np.isnan(vperf))]
             vperfext=np.array(sorted([vperf[i//100]-S*np.log(i%100+1) for i in range(len(vperf)*100)])[::-1])
             ratenom=0
             rateden=0
