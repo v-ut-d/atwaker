@@ -272,22 +272,38 @@ def perf_calc(db,dt):
 
 def rate_calc(db,dt):
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+    S=724.4744301
+    R=0.8271973364
     if len(dbr)>0:
         vlast=dbr.iloc[-1]
         dbr.loc[dt]=vlast
+        timelapse=0.99**((np.datetime64(dt)-np.array(db.index,dtype="datetime64"))//np.timedelta64(1,"D"))
     else:
         dbr.loc[dt]=[0]*len(dbr.columns)
+        timelapse=np.array([1])
     for xx in db.columns:
-        if db.loc[dt,xx]==db.loc[dt,xx]:
-            vperf=db[xx].dropna().values[::-1]
+        # if db.loc[dt,xx]==db.loc[dt,xx]:
+            # vperf=db[xx].dropna().values[::-1]
+            # ratenom=0
+            # rateden=0
+            # for i in range(len(vperf)):
+            #     ratenom+=2.0**(vperf[i]/800)*(0.9**(i+1))
+            #     rateden+=0.9**(i+1)
+            # raz=len(vperf)
+            # corr=((1-0.81**raz)**0.5/(1-0.9**raz)-1)/(19**0.5-1)*1200
+            # rate=800*np.log(ratenom/rateden)/np.log(2)-corr
+            # if rate<=400:
+            #     rate=400*np.e**(rate/400-1)
+            # dbr.at[dt,xx]=int(rate+0.5)
+        if True:
+            vperf=(db[xx]*timelapse).dropna().values[::-1]
+            vperfext=np.array(sorted([vperf[i//100]-S*np.log(i%100+1) for i in range(len(vperf)*100)])[::-1])
             ratenom=0
             rateden=0
-            for i in range(len(vperf)):
-                ratenom+=2.0**(vperf[i]/800)*(0.9**(i+1))
-                rateden+=0.9**(i+1)
-            raz=len(vperf)
-            corr=((1-0.81**raz)**0.5/(1-0.9**raz)-1)/(19**0.5-1)*1200
-            rate=800*np.log(ratenom/rateden)/np.log(2)-corr
+            for i in range(100):
+                ratenom+=vperfext[i]*(R**(i+1))
+                rateden+=R**(i+1)
+            rate=ratenom/rateden
             if rate<=400:
                 rate=400*np.e**(rate/400-1)
             dbr.at[dt,xx]=int(rate+0.5)
@@ -389,7 +405,8 @@ async def on_message(message):
                         zant=""
                         num+=1
                         try:
-                            if (dbd.iloc[-1].loc[str(xx.id)]==dbd.iloc[-1].loc[str(xx.id)]) and len(dbr)>1:
+                            # if (dbd.iloc[-1].loc[str(xx.id)]==dbd.iloc[-1].loc[str(xx.id)]) and len(dbr)>1:
+                            if len(dbr)>1:
                                 change=("(+"+str(int(dbr.iloc[-1].loc[str(xx.id)]-dbr.iloc[-2].loc[str(xx.id)]))+")").replace("+-","-")
                             else:
                                 change="(--)"
