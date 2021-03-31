@@ -480,7 +480,8 @@ async def on_message(message):
                             elif len(dbd[str(userid)].dropna())<14:
                                 zant="(暫定)"
                             try:
-                                if (dbd.iloc[-1].loc[str(userid)]==dbd.iloc[-1].loc[str(userid)]) and len(dbr)>1:
+                                # if (dbd.iloc[-1].loc[str(userid)]==dbd.iloc[-1].loc[str(userid)]) and len(dbr)>1:
+                                if len(dbr)>1:
                                     change=("(+"+str(int(dbr.iloc[-1].loc[str(userid)]-dbr.iloc[-2].loc[str(userid)]))+")").replace("+-","-")
                                 else:
                                     change="(--)"
