@@ -302,13 +302,16 @@ def rate_calc(db,dt):
             print(vperfext)
             ratenom=0
             rateden=0
-            for i in range(100):
-                ratenom+=vperfext[i]*(R**(i+1))
-                rateden+=R**(i+1)
-            rate=ratenom/rateden
-            if rate<=400:
-                rate=400*np.e**(rate/400-1)
-            dbr.at[dt,xx]=int(rate+0.5)
+            if len(vperfext)>=100:
+                for i in range(100):
+                    ratenom+=vperfext[i]*(R**(i+1))
+                    rateden+=R**(i+1)
+                rate=ratenom/rateden
+                if rate<=400:
+                    rate=400*np.e**(rate/400-1)
+                dbr.at[dt,xx]=int(rate+0.5)
+            else:
+                dbr.at[dt,xx]=0
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     return
 
