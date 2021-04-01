@@ -275,7 +275,7 @@ def rate_calc(db,dt):
     I=1200
     N=10000
     R=(15*10**12+490153)**(10/N)/10**(140/N)
-    S=I/sum([R*(i+1)*np.log(i+1) for i in range(N)])*sum([R*(i+1) for i in range(N)])
+    S=I/sum([R**(i+1)*np.log(i+1) for i in range(N)])*sum([R**(i+1) for i in range(N)])
     if len(dbr)>0:
         vlast=dbr.iloc[-1]
         dbr.loc[dt]=vlast
