@@ -272,7 +272,7 @@ def perf_calc(db,dt):
 
 def rate_calc(db,dt):
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-    I=1200
+    I=1000
     N=10000
     L=np.log(N)/np.log(100)
     R=(15*10**12+490153)**(10/N)/10**(140/N)
