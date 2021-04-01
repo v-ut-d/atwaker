@@ -276,7 +276,7 @@ def rate_calc(db,dt):
     N=10000
     L=np.log(N)/np.log(100)
     R=(15*10**12+490153)**(10/N)/10**(140/N)
-    S=I/sum([np.log(101-(101-(i+1)**(1/L)))*R**(i+1) for i in range(N)])*sum([R**(i+1) for i in range(N)])
+    S=I/sum([np.log(101-(N-i)**(1/L))*R**(i+1) for i in range(N)])*sum([R**(i+1) for i in range(N)])
     print(R,S)
     if len(dbr)>0:
         vlast=dbr.iloc[-1]
@@ -302,7 +302,7 @@ def rate_calc(db,dt):
         if True:
             vperf=np.array((db[xx].values*timelapse)[::-1],dtype=float)
             vperf=vperf[np.logical_not(np.isnan(vperf))]
-            vperfext=np.array(sorted([vperf[i//N]-S*np.log(101-(101-(i%N+1)**(1/L))) for i in range(len(vperf)*N)])[::-1])
+            vperfext=np.array(sorted([vperf[i//N]-S*np.log(101-(N-i%N)**(1/L)) for i in range(len(vperf)*N)])[::-1])
             print(vperfext)
             ratenom=0
             rateden=0
