@@ -272,8 +272,10 @@ def perf_calc(db,dt):
 
 def rate_calc(db,dt):
     dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-    S=724.4744301
-    R=0.8271973364
+    I=1200
+    N=10000
+    R=(15*10**12+490153)**(10/N)/10**(140/N)
+    S=I/sum([R*(i+1)*np.log(i+1) for i in range(N)])*sum([R*(i+1) for i in range(N)])
     if len(dbr)>0:
         vlast=dbr.iloc[-1]
         dbr.loc[dt]=vlast
@@ -298,12 +300,12 @@ def rate_calc(db,dt):
         if True:
             vperf=np.array((db[xx].values*timelapse)[::-1],dtype=float)
             vperf=vperf[np.logical_not(np.isnan(vperf))]
-            vperfext=np.array(sorted([vperf[i//100]-S*np.log(i%100+1) for i in range(len(vperf)*100)])[::-1])
+            vperfext=np.array(sorted([vperf[i//N]-S*np.log(i%N+1) for i in range(len(vperf)*N)])[::-1])
             print(vperfext)
             ratenom=0
             rateden=0
-            if len(vperfext)>=100:
-                for i in range(100):
+            if len(vperfext)>=N:
+                for i in range(N):
                     ratenom+=vperfext[i]*(R**(i+1))
                     rateden+=R**(i+1)
                 rate=ratenom/rateden
