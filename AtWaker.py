@@ -156,45 +156,45 @@ async def contest_end(dt):
     contesting=0
     save_vars()
     if num_ra>0:
-            await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
-                                +str(len(v.dropna()))+'人でした。')
-            db.loc[dt]=[np.nan for _ in range(len(db.columns))]
-            perf_calc(db,dt)
-            db=get_cached_df('AtWaker_data_'+str(serverid))
-            rate_calc(db,dt)
-            vs=v.dropna().sort_values(by='rank')
-            for j in range(1,min(min_display+1,len(vs)+1)):
-                jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
-                try:
-                    perf=int(db.loc[dt,vs.index[j-1]])
-                except Exception as e:
-                    print(j,e)
-                    perf=db.loc[dt,vs.index[j-1]]
-                try:
-                    if perf>=2800:
-                        color='\U0001f534'
-                    elif perf>=2400:
-                        color='\U0001f7e0'
-                    elif perf>=2000:
-                        color='\U0001f7e1'
-                    elif perf>=1600:
-                        color='\U0001f7e3'
-                    elif perf>=1200:
-                        color='\U0001f535'
-                    elif perf>=800:
-                        color='\U0001f7e2'
-                    elif perf>=400:
-                        color='\U0001f7e4'
-                    elif perf>=0:
-                        color='\U000026aa'
-                    else:
-                        color=""
-                except Exception as e:
-                    print(j,e)
+        await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
+                            +str(len(v.dropna()))+'人でした。')
+        db.loc[dt]=[np.nan for _ in range(len(db.columns))]
+        perf_calc(db,dt)
+        db=get_cached_df('AtWaker_data_'+str(serverid))
+        rate_calc(db,dt)
+        vs=v.dropna().sort_values(by='rank')
+        for j in range(1,min(min_display+1,len(vs)+1)):
+            jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
+            try:
+                perf=int(db.loc[dt,vs.index[j-1]])
+            except Exception as e:
+                print(j,e)
+                perf=db.loc[dt,vs.index[j-1]]
+            try:
+                if perf>=2800:
+                    color='\U0001f534'
+                elif perf>=2400:
+                    color='\U0001f7e0'
+                elif perf>=2000:
+                    color='\U0001f7e1'
+                elif perf>=1600:
+                    color='\U0001f7e3'
+                elif perf>=1200:
+                    color='\U0001f535'
+                elif perf>=800:
+                    color='\U0001f7e2'
+                elif perf>=400:
+                    color='\U0001f7e4'
+                elif perf>=0:
+                    color='\U000026aa'
+                else:
                     color=""
-                await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
-                                    +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
-                                    +str(perf)+color)
+            except Exception as e:
+                print(j,e)
+                color=""
+            await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
+                                +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
+                                +str(perf)+color)
     else:
         await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
 
@@ -373,7 +373,7 @@ async def on_message(message):
         # channelid=message.channel.id
     channel = message.channel
     guild=client.get_guild(serverid)
-    if message.content.startswith("!atw ") and (message.author.id!=thisbotid):
+    if message.content.startswith("!atw ") and (message.author.id!=thisbotid) and not message.author.bot:
         if message.content.startswith("!atw start "):
             global emj
             emj=message.content[11:]
