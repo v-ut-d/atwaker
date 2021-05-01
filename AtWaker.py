@@ -334,7 +334,7 @@ async def on_ready():
         renew_db(serverid)
     else:
         make_db(serverid)
-    await channel.send('起動しました。')
+    await channel.send(emj)
     return
 
 # リアクション受信時に動作する処理
