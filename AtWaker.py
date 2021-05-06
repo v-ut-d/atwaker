@@ -222,7 +222,7 @@ def perf_calc(db,dt):
     if dt in db.index:
         db=db.drop(dt,axis=0)
     v['total']=np.sum(v[[str(i) for i in range(msg_raz)]].values,axis=1)
-    if 86400-max(v)<=60:
+    if 86400-max(v['total'].values)<=60:
         v['total']=(v['total']+60)%86400
     v=v.sort_values(by='total',ascending=False)
     v['rank']=((max(v['total'].values)-v['total'].values)/(60*clen*(msg_raz+1)/2))*(len(v)-1)
