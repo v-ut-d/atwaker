@@ -312,7 +312,7 @@ def rate_calc(db,dt):
             vperf=np.array((db[xx].values*timelapse)[::-1],dtype=float)
             vperf=vperf[np.logical_not(np.isnan(vperf))]
             vperfext=np.array(sorted([vperf[i//N]-S*np.log(101-(N-i%N)**(1/L)) for i in range(len(vperf)*N)])[::-1])
-            print(vperfext)
+            print(vperfext[:N])
             ratenom=0
             rateden=0
             if len(vperfext)>=N:
