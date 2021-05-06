@@ -268,8 +268,8 @@ def perf_calc(db,dt):
         dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
     perfave=dbc.iloc[-1].dropna().mean()
     perfstd=dbc.iloc[-1].dropna().std(ddof=0)
-    correctionave=1200
-    correctionstd=1600*np.log(6.0)
+    correctionave=2000
+    correctionstd=800*np.log(6.0)
     dbc.iloc[-1]+=correctionave-perfave
     if len(dbc.iloc[-1].dropna())>1:
         dbc.iloc[-1]=correctionave+(dbc.iloc[-1]-correctionave)*correctionstd/perfstd
