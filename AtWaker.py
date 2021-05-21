@@ -6,7 +6,7 @@ from discord.ext import tasks
 from datetime import datetime ,timedelta
 # from dotenv import load_dotenv
 import time
-import asyncio
+# import asyncio
 import r
 import pickle
 
@@ -125,9 +125,10 @@ async def contest():
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     global num_ra
     num_ra=0
+    dbl=len(get_cached_df('AtWaker_data_'+str(serverid)))+1
     save_vars()
     await channel.send('おはようございます！ Good morning!\n'+dt
-                            +'のAtWaker Contest開始です。\n起きた人は下の「'+dt+'」の\nメッセージに'
+                            +'のAtWaker Contest '+str(dbl)+'開始です。\n起きた人は下の「'+dt+'」の\nメッセージに'
                             +emj+'でリアクションしてね。\n徹夜勢の参加は禁止です。\n一度寝てから出直してください。')
     global contesting
     contesting=1
@@ -149,6 +150,7 @@ async def contest_msg(i):
 async def contest_end(dt):
     print('Contest ended')
     db=get_cached_df('AtWaker_data_'+str(serverid))
+    dbl=len(db)+1
     channel = client.get_channel(channelid)
     global contesting
     global num_ra
@@ -156,7 +158,7 @@ async def contest_end(dt):
     contesting=0
     save_vars()
     if num_ra>0:
-        await channel.send(dt+'のAtWaker Contestは終了しました。\n参加者は'
+        await channel.send(dt+'のAtWaker Contest '+str(dbl)+'は終了しました。\n参加者は'
                             +str(len(v.dropna()))+'人でした。')
         db.loc[dt]=[np.nan for _ in range(len(db.columns))]
         perf_calc(db,dt)
