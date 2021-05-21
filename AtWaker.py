@@ -278,6 +278,8 @@ def perf_calc(db,dt):
     for j in range(len(vc))[::-1]:
         if dbc.at[dt,vc.index[j]]<=400:
             dbc.at[dt,vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
+        elif dbc.at[dt,vc.index[j]]*0==0:
+            dbc.at[dt,vc.index[j]]=int(dbc.iloc[-1].loc[vc.index[j]])
     cache_df('AtWaker_data_'+str(serverid),dbc)
     return 
 
