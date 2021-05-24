@@ -16,7 +16,7 @@ TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
-bot = commands.Bot(command_prefix = 'emoji-analyzer ')
+bot = commands.Bot(command_prefix = '!atw ')
 channelid=int(os.environ['CHANNEL'])
 # channelid=805767047900168223
 serverid=int(os.environ['SERVER'])
@@ -339,7 +339,7 @@ def rate_calc(db,dt):
 
 
 # 起動時に動作する処理
-@client.event
+@bot.event
 async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print('ログインしました。')
@@ -351,9 +351,6 @@ async def on_ready():
     await channel.send(emj)
     return
 
-@bot.event
-async def on_ready():
-    print('bot logged in')
 
 # リアクション受信時に動作する処理
 @client.event
@@ -611,7 +608,7 @@ async def show_help(ctx):
     return
 
 @bot.command()
-async def perf_ranking(ctx, arg):
+async def contest_end(ctx, arg):
     if ctx.author.id != 602203895464329216:
         await ctx.send('そのコマンドは存在しません。')
     global num_ra
