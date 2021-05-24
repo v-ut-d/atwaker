@@ -666,7 +666,7 @@ load_vars()
 loop.start()
 
 # Botの起動とDiscordサーバーへの接続
-client.run(TOKEN)
-bot.run(TOKEN)
 
+bot.run(TOKEN)
+# client.run(TOKEN)
 
