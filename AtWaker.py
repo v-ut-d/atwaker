@@ -601,7 +601,7 @@ async def perf_ranking(ctx, arg1, arg2):
     return
 
 @bot.command()
-async def help(ctx):
+async def show_help(ctx):
     if ctx.author.bot:
         return
     f = open('help.txt', 'r')
