@@ -16,7 +16,7 @@ TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
 client = discord.Client(intents=intents)
-bot = commands.Bot(command_prefix = 'emoji-analyzer ')
+bot = commands.Bot(command_prefix = '!atw ')
 channelid=int(os.environ['CHANNEL'])
 # channelid=805767047900168223
 serverid=int(os.environ['SERVER'])
