@@ -15,7 +15,6 @@ import pickle
 TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
-client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix = '!atw ')
 channelid=int(os.environ['CHANNEL'])
 # channelid=805767047900168223
@@ -81,7 +80,7 @@ def save_vars():
     cache_df("v_"+str(serverid),v)
 
 def renew_db(serverid):
-    guild=client.get_guild(serverid)
+    guild=bot.get_guild(serverid)
     db=get_cached_df('AtWaker_data_'+str(serverid))
     for xx in {str(aa.id) for aa in guild.members}-set(db.columns.astype(str)):
         db[xx]=[np.nan for _ in range(len(db))]
@@ -93,7 +92,7 @@ def renew_db(serverid):
     print("df renewed")
     
 def make_db(serverid):
-    guild=client.get_guild(serverid)
+    guild=bot.get_guild(serverid)
     db=pd.DataFrame(columns=[str(xx.id) for xx in guild.members],index=[])
     cache_df('AtWaker_data_'+str(serverid),db)
     dbr=pd.DataFrame(columns=[str(xx.id) for xx in guild.members],index=[])
@@ -103,7 +102,7 @@ def make_db(serverid):
 # async def repeat1(start,msg):
 #   while time.time()-start<60*(clen+1):
 #     print('rep1s')
-#     reaction, user = await client.wait_for('reaction_add', check=lambda r, u: 
+#     reaction, user = await bot.wait_for('reaction_add', check=lambda r, u: 
 #                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u.id==thisbotid))))
 #     print('rep1')
 #     if r.emoji==emj:
@@ -119,7 +118,7 @@ def make_db(serverid):
 #   await msg.add_reaction(emoji=emj2)
     
 async def contest():
-    channel = client.get_channel(channelid)
+    channel = bot.get_channel(channelid)
     global v
     v=pd.DataFrame(columns=['rank','time']+[str(i) for i in range(msg_raz)]+['total'],index=[])
     save_vars()
@@ -139,7 +138,7 @@ async def contest():
     return
     
 async def contest_msg(i):
-    channel = client.get_channel(channelid)
+    channel = bot.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt)    
     await msg.add_reaction(emoji=emj)
@@ -152,7 +151,7 @@ async def contest_end(dt):
     print('Contest ended')
     db=get_cached_df('AtWaker_data_'+str(serverid))
     dbl=len(db)+1
-    channel = client.get_channel(channelid)
+    channel = bot.get_channel(channelid)
     global contesting
     global num_ra
     global v
@@ -167,7 +166,7 @@ async def contest_end(dt):
         rate_calc(db,dt)
         vs=v.dropna().sort_values(by='rank')
         for j in range(1,min(min_display+1,len(vs)+1)):
-            jthuser=client.get_guild(serverid).get_member(int(vs.index[j-1]))
+            jthuser=bot.get_guild(serverid).get_member(int(vs.index[j-1]))
             try:
                 perf=int(db.loc[dt,vs.index[j-1]])
             except Exception as e:
@@ -339,11 +338,11 @@ def rate_calc(db,dt):
 
 
 # 起動時に動作する処理
-@client.event
+@bot.event
 async def on_ready():
     # 起動したらターミナルにログイン通知が表示される
     print('ログインしました。')
-    channel = client.get_channel(channelid)
+    channel = bot.get_channel(channelid)
     if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
         renew_db(serverid)
     else:
@@ -351,17 +350,13 @@ async def on_ready():
     await channel.send(emj)
     return
 
-@bot.event
-async def on_ready():
-    print('bot logged in')
-
 # リアクション受信時に動作する処理
-@client.event
+@bot.event
 async def on_raw_reaction_add(payload):
     global v
     global num_ra
-    guild=client.get_guild(serverid)
-    channel = client.get_channel(channelid)
+    guild=bot.get_guild(serverid)
+    channel = bot.get_channel(channelid)
     user=guild.get_member(payload.user_id)
     try:
         msg=await channel.fetch_message(payload.message_id)
@@ -621,7 +616,7 @@ async def perf_ranking(ctx, arg):
 
 
   
-@client.event
+@bot.event
 async def on_member_join(member):
     if not (serverid==None) and not (channelid==None):
         renew_db(serverid)
@@ -647,7 +642,7 @@ async def loop():
         dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
         await contest_end(dt)
     elif(3600*hgn+60*mgn-300*interv<=now<3600*hgn+60*mgn-240*interv):
-        channel = client.get_channel(channelid)
+        channel = bot.get_channel(channelid)
         await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
     # else:
     #     for i in range(1,msg_raz):
@@ -669,7 +664,6 @@ load_vars()
 loop.start()
 
 # Botの起動とDiscordサーバーへの接続
-client.run(TOKEN)
 bot.run(TOKEN)
 
 
