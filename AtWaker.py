@@ -415,7 +415,7 @@ async def reset(ctx, arg):
     return
 
 @bot.command()
-async def rating(ctx, arg):
+async def rating(ctx, arg, force=''):
     if ctx.author.bot:
         return
     async with ctx.channel.typing():
@@ -472,7 +472,7 @@ async def rating(ctx, arg):
                         print(e)
                         color=""
                     msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
-                    if num > 10:
+                    if num > 10 and force=='force':
                         await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
                         return
             if num==0:
