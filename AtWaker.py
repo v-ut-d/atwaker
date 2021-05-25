@@ -574,7 +574,7 @@ async def perf_ranking(ctx, arg1, arg2):
                     if ctx.guild.get_member(userid)==None:
                         username='[deleted]'
                     else:
-                        username=guild.get_member(userid).display_name
+                        username=ctx.guild.get_member(userid).display_name
                     try:
                         if perf>=2800:
                             color='\U0001f534'
