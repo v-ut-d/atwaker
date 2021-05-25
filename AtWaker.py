@@ -472,7 +472,7 @@ async def rating(ctx, arg, force=''):
                         print(e)
                         color=""
                     msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
-                    if num > 10 and force=='force':
+                    if num > 10 and force!='force':
                         await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
                         return
             if num==0:
