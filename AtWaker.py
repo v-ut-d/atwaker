@@ -15,11 +15,11 @@ import pickle
 TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
-bot = commands.Bot(command_prefix = '!atw ')
+bot = commands.Bot(command_prefix = '!atw ', intents=intents)
 channelid=int(os.environ['CHANNEL'])
 # channelid=805767047900168223
 serverid=int(os.environ['SERVER'])
-thisbotid=int(os.environ['THISBOT'])
+me=bot.user
 z=86400*((365.25*50)//1+5/8)//1
 hs=7
 ms=30
@@ -103,7 +103,7 @@ def make_db(serverid):
 #   while time.time()-start<60*(clen+1):
 #     print('rep1s')
 #     reaction, user = await bot.wait_for('reaction_add', check=lambda r, u: 
-#                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u.id==thisbotid))))
+#                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u==me))))
 #     print('rep1')
 #     if r.emoji==emj:
 #       v=record_rank(user,num_ra,v)
@@ -363,11 +363,11 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(e)
         return
-    print((contesting==1) , (user.id!=thisbotid))
-    if (contesting==1) and (user.id!=thisbotid):
+    print((contesting==1) , (user!=me))
+    if (contesting==1) and (user!=me):
         for i in range(msg_raz):
             bool1=(str(payload.emoji)==str(emj))
-            bool2=(msg.author.id==thisbotid) 
+            bool2=(msg.author==me) 
             # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
             bool3=(msg.id==msg_id)
             print(bool1,bool2,bool3)
