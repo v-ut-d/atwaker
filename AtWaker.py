@@ -423,6 +423,7 @@ async def rating(ctx, arg):
             dbr=get_cached_df('AtWaker_rate_'+str(serverid))
             dbd=get_cached_df('AtWaker_data_'+str(serverid))
             num=0
+            msgstrs=[]
             print(len(ctx.guild.members))
             for xx in ctx.guild.members:
                 if arg in xx.display_name:
@@ -470,9 +471,18 @@ async def rating(ctx, arg):
                     except Exception as e:
                         print(e)
                         color=""
-                    await ctx.send(xx.display_name+':'+str(rate)+color+change+zant)
+                    msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
+                    if num > 10:
+                        await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
+                        return
             if num==0:
                 await ctx.send('ユーザーが見つかりません。')
+            else:
+                for i in range(num):
+                    if i == num-1:
+                        await ctx.send(msgstrs[i])
+                    else:
+                        ctx.send(msgstrs[i])
         else:
             await ctx.send('初めに!atw start (絵文字)を実行してください。')
     return
