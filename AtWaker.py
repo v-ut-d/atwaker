@@ -402,29 +402,29 @@ async def start(ctx, emoji):
     await ctx.send('起動しました。')
     return
 
-@bot.command()
-async def reset(ctx, arg):
-    if ctx.author.id != 602203895464329216:
-        return
-    if arg=='all':
-        conn.delete('AtWaker_rate_'+str(serverid))
-        print("rate cache reset")
-        conn.delete('AtWaker_data_'+str(serverid))
-        print("data cache reset")
-        make_db(serverid)
-        await ctx.send('データを全て消去しました。')
-    else:
-        try:
-            dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-            dbd=get_cached_df('AtWaker_data_'+str(serverid))
-            dbr.drop(arg,axis=0)
-            dbd.drop(arg,axis=0)
-            cache_df('AtWaker_rate_'+str(serverid),dbr)
-            cache_df('AtWaker_data_'+str(serverid),dbd)
-            await ctx.send(arg+'のデータを消去しました。')
-        except:
-            await ctx.send('引数が不正です。')
-    return
+# @bot.command()
+# async def reset(ctx, arg):
+#     if ctx.author.id != 602203895464329216:
+#         return
+#     if arg=='all':
+#         conn.delete('AtWaker_rate_'+str(serverid))
+#         print("rate cache reset")
+#         conn.delete('AtWaker_data_'+str(serverid))
+#         print("data cache reset")
+#         make_db(serverid)
+#         await ctx.send('データを全て消去しました。')
+#     else:
+#         try:
+#             dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+#             dbd=get_cached_df('AtWaker_data_'+str(serverid))
+#             dbr.drop(arg,axis=0)
+#             dbd.drop(arg,axis=0)
+#             cache_df('AtWaker_rate_'+str(serverid),dbr)
+#             cache_df('AtWaker_data_'+str(serverid),dbd)
+#             await ctx.send(arg+'のデータを消去しました。')
+#         except:
+#             await ctx.send('引数が不正です。')
+#     return
 
 @bot.command()
 async def rating(ctx, arg, force=''):
