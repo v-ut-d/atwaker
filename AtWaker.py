@@ -15,7 +15,12 @@ import pickle
 TOKEN = os.environ['TOKEN']
 intents = discord.Intents.all()
 # 接続に必要なオブジェクトを生成
+
 bot = commands.Bot(command_prefix = '!atw ', intents=intents)
+
+# client = discord.Client(intents=intents)
+# bot = commands.Bot(command_prefix = '!atw ')
+
 channelid=int(os.environ['CHANNEL'])
 # channelid=805767047900168223
 serverid=int(os.environ['SERVER'])
@@ -350,6 +355,7 @@ async def on_ready():
     await channel.send(emj)
     return
 
+
 # リアクション受信時に動作する処理
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -614,9 +620,8 @@ async def contest_end(ctx, arg):
     await contest_end(arg)
     return
 
-"""
 @bot.command()
-async def help(ctx):
+async def show_help(ctx):
     if ctx.author.bot:
         return
     f = open('help.txt', 'r')
@@ -624,7 +629,6 @@ async def help(ctx):
     f.close()
     await ctx.send(helpstr)
     return
-"""
 
 @tasks.loop(seconds=60*interv)
 async def loop():
@@ -668,6 +672,8 @@ load_vars()
 loop.start()
 
 # Botの起動とDiscordサーバーへの接続
-bot.run(TOKEN)
 
+
+bot.run(TOKEN)
+# client.run(TOKEN)
 
