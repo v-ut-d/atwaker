@@ -611,14 +611,14 @@ async def perf_ranking(ctx, arg1, arg2):
         await ctx.send('初めに!atw start (絵文字)を実行してください。')
     return
 
-@bot.command()
-async def contest_end(ctx, arg):
-    if ctx.author.id != 602203895464329216:
-        return
-    global num_ra
-    num_ra=1
-    await contest_end(arg)
-    return
+# @bot.command()
+# async def contest_end(ctx, arg):
+#     if ctx.author.id != 602203895464329216:
+#         return
+#     global num_ra
+#     num_ra=1
+#     await contest_end(arg)
+#     return
 
 @bot.command()
 async def show_help(ctx):
