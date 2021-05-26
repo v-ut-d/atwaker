@@ -627,7 +627,11 @@ async def show_help(ctx):
     f = open('help.txt', 'r')
     helpstr = f.read()
     f.close()
-    await ctx.send(helpstr)
+    helpspt=helpstr.split("/\n")
+    embed = discord.Embed(title=helpspt[0],description=helpspt[1])
+    for i in range(1,len(helpspt)//2)
+    embed.add_field(name=helpspt[2*i],value=helpspt[2*i+1],inline=False)
+    await ctx.send(embed=embed)
     return
 
 @tasks.loop(seconds=60*interv)
