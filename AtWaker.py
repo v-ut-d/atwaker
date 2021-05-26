@@ -628,9 +628,10 @@ async def show_help(ctx):
     helpstr = f.read()
     f.close()
     helpspt=helpstr.split("/\n")
-    embed = discord.Embed(title=helpspt[0],description=helpspt[1])
-    for i in range(1,len(helpspt)//2):
-        embed.add_field(name=helpspt[2*i],value=helpspt[2*i+1],inline=False)
+    embed = discord.Embed(title=helpspt[0]+"/"+helpspt[2],description=helpspt[1])
+
+    for i in range(1,(len(helpspt)-1)//2):
+        embed.add_field(name=helpspt[2*i+1],value=helpspt[2*i+2],inline=False)
     await ctx.send(embed=embed)
     return
 
