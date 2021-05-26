@@ -49,7 +49,7 @@ conn=r.connect()
 def cache_df(alias,df):
     df_compressed = pickle.dumps(df)
     res = conn.set(alias,df_compressed)
-    if res == True:
+    if res:
         print('df cached')
 
 def get_cached_df(alias):
@@ -59,7 +59,6 @@ def get_cached_df(alias):
     except:
         print("No data")
         return None
-
 
 def load_vars():
     global v
@@ -104,24 +103,25 @@ def make_db(serverid):
     cache_df('AtWaker_rate_'+str(serverid),dbr)
     print("df made")
 
-# async def repeat1(start,msg):
-#   while time.time()-start<60*(clen+1):
-#     print('rep1s')
-#     reaction, user = await bot.wait_for('reaction_add', check=lambda r, u: 
-#                                            (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u==me))))
-#     print('rep1')
-#     if r.emoji==emj:
-#       v=record_rank(user,num_ra,v)
-#       num_ra+=1
-#     elif r.emoji==emj2:
-#       break
+"""
+async def repeat1(start,msg):
+  while time.time()-start<60*(clen+1):
+    print('rep1s')
+    reaction, user = await bot.wait_for('reaction_add', check=lambda r, u: 
+                                           (r.message.id==msg.id) and ((r.emoji==emj) or ((r.emoji==emj2) and (u==me))))
+    print('rep1')
+    if r.emoji==emj:
+      v=record_rank(user,num_ra,v)
+      num_ra+=1
+    elif r.emoji==emj2:
+      break
 
+async def repeat2(msg):
+  await asyncio.sleep(60*clen)
+  print('rep2')
+  await msg.add_reaction(emoji=emj2)
+"""
 
-# async def repeat2(msg):
-#   await asyncio.sleep(60*clen)
-#   print('rep2')
-#   await msg.add_reaction(emoji=emj2)
-    
 async def contest():
     channel = bot.get_channel(channelid)
     global v
@@ -138,11 +138,11 @@ async def contest():
     global contesting
     contesting=1
     save_vars()
-    await contest_msg(0)
+    await contest_msg()
     print('Contest started')
     return
     
-async def contest_msg(i):
+async def contest_msg():
     channel = bot.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt)    
@@ -380,7 +380,13 @@ async def on_raw_reaction_add(payload):
             if bool1 and bool2 and bool3:
                 record_rank(user,i)
     return
-    
+
+@bot.event
+async def on_member_join(member):
+    if not (serverid==None) and not (channelid==None):
+        renew_db(serverid)
+    return
+
 @bot.command()
 async def start(ctx, emoji):
     if ctx.author.bot:
@@ -424,37 +430,106 @@ async def reset(ctx, arg):
 async def rating(ctx, arg, force=''):
     if ctx.author.bot:
         return
-    async with ctx.channel.typing():
-        if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
-            dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-            dbd=get_cached_df('AtWaker_data_'+str(serverid))
-            num=0
-            msgstrs=[]
-            print(len(ctx.guild.members))
-            for xx in ctx.guild.members:
-                if arg in xx.display_name:
-                    zant=""
-                    num+=1
+    if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame) and  isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
+        dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+        dbd=get_cached_df('AtWaker_data_'+str(serverid))
+        num=0
+        msgstrs=[]
+        print(len(ctx.guild.members))
+        for xx in ctx.guild.members:
+            if arg in xx.display_name:
+                zant=""
+                num+=1
+                try:
+                    # if (dbd.iloc[-1].loc[str(xx.id)]==dbd.iloc[-1].loc[str(xx.id)]) and len(dbr)>1:
+                    if len(dbr)>1:
+                        change=("(+"+str(int(dbr.iloc[-1].loc[str(xx.id)]-dbr.iloc[-2].loc[str(xx.id)]))+")").replace("+-","-")
+                    else:
+                        change="(--)"
+                except Exception as e:
+                    print(xx.display_name,e)
+                    change=""
+                if len(dbd[str(xx.id)].dropna())>0:
                     try:
-                        # if (dbd.iloc[-1].loc[str(xx.id)]==dbd.iloc[-1].loc[str(xx.id)]) and len(dbr)>1:
+                        rate=int(dbr.iloc[-1].loc[str(xx.id)])
+                    except Exception as e:
+                        print(xx.display_name,e)
+                        rate=dbr.iloc[-1].loc[str(xx.id)]
+                    if(len(dbd[str(xx.id)].dropna())<14):
+                        zant="(暫定)"
+                else:
+                    rate=0
+                    zant="(未参加)"
+                try:
+                    if rate>=2800:
+                        color='\U0001f534'
+                    elif rate>=2400:
+                        color='\U0001f7e0'
+                    elif rate>=2000:
+                        color='\U0001f7e1'
+                    elif rate>=1600:
+                        color='\U0001f7e3'
+                    elif rate>=1200:
+                        color='\U0001f535'
+                    elif rate>=800:
+                        color='\U0001f7e2'
+                    elif rate>=400:
+                        color='\U0001f7e4'
+                    elif rate>=0:
+                        color='\U000026aa'
+                    else:
+                        color=""
+                except Exception as e:
+                    print(e)
+                    color=""
+                msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
+                if num > 10 and force!='force':
+                    await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
+                    return
+        if num==0:
+            await ctx.send('ユーザーが見つかりません。')
+        else:
+            for i in range(num):
+                await ctx.send(msgstrs[i])
+    else:
+        await ctx.send('初めに!atw start (絵文字)を実行してください。')
+    return
+
+@bot.command()
+async def rating_ranking(ctx, arg):
+    if ctx.author.bot:
+        return
+    if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame):
+        dbr=get_cached_df('AtWaker_rate_'+str(serverid))
+        dbd=get_cached_df('AtWaker_data_'+str(serverid))
+        if len(dbr)>0:
+            try:
+                z=max(int(arg),1)
+                for rk in range(z-1,min(z-1+min_display,len(dbr.iloc[-1]))):
+                    try:
+                        rate=int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
+                    except Exception as e:
+                        print(rk,e)
+                        rate=dbr.iloc[-1].sort_values(ascending=False).iloc[rk]
+                    userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
+                    zant=""
+                    if ctx.guild.get_member(userid)==None:
+                        username='[deleted]'
+                    else:
+                        username=ctx.guild.get_member(userid).display_name
+                    if len(dbd[str(userid)].dropna())==0:
+                        zant="(未参加)"
+                    elif len(dbd[str(userid)].dropna())<14:
+                        zant="(暫定)"
+                    try:
+                        # if (dbd.iloc[-1].loc[str(userid)]==dbd.iloc[-1].loc[str(userid)]) and len(dbr)>1:
                         if len(dbr)>1:
-                            change=("(+"+str(int(dbr.iloc[-1].loc[str(xx.id)]-dbr.iloc[-2].loc[str(xx.id)]))+")").replace("+-","-")
+                            change=("(+"+str(int(dbr.iloc[-1].loc[str(userid)]-dbr.iloc[-2].loc[str(userid)]))+")").replace("+-","-")
                         else:
                             change="(--)"
                     except Exception as e:
-                        print(xx.display_name,e)
+                        print(e)
                         change=""
-                    if len(dbd[str(xx.id)].dropna())>0:
-                        try:
-                            rate=int(dbr.iloc[-1].loc[str(xx.id)])
-                        except Exception as e:
-                            print(xx.display_name,e)
-                            rate=dbr.iloc[-1].loc[str(xx.id)]
-                        if(len(dbd[str(xx.id)].dropna())<14):
-                            zant="(暫定)"
-                    else:
-                        rate=0
-                        zant="(未参加)"
                     try:
                         if rate>=2800:
                             color='\U0001f534'
@@ -477,138 +552,72 @@ async def rating(ctx, arg, force=''):
                     except Exception as e:
                         print(e)
                         color=""
-                    msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
-                    if num > 10 and force!='force':
-                        await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
-                        return
-            if num==0:
-                await ctx.send('ユーザーが見つかりません。')
-            else:
-                for i in range(num):
-                    if i == num-1:
-                        await ctx.send(msgstrs[i])
-                    else:
-                        ctx.send(msgstrs[i])
+                    await ctx.send(str(rk+1)+'位:'+username+' '+str(rate)+color+change+zant)
+            except Exception as e:
+                print(e)
+                await ctx.send('引数が不正です。')
         else:
-            await ctx.send('初めに!atw start (絵文字)を実行してください。')
-    return
-
-@bot.command()
-async def rating_ranking(ctx, arg):
-    if ctx.author.bot:
-        return
-    async with ctx.channel.typing():
-        if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame):
-            dbr=get_cached_df('AtWaker_rate_'+str(serverid))
-            dbd=get_cached_df('AtWaker_data_'+str(serverid))
-            if len(dbr)>0:
-                try:
-                    z=max(int(arg),1)
-                    for rk in range(z-1,min(z-1+min_display,len(dbr.iloc[-1]))):
-                        try:
-                            rate=int(dbr.iloc[-1].sort_values(ascending=False).iloc[rk])
-                        except Exception as e:
-                            print(rk,e)
-                            rate=dbr.iloc[-1].sort_values(ascending=False).iloc[rk]
-                        userid=int(dbr.iloc[-1].sort_values(ascending=False).index[rk])
-                        zant=""
-                        if ctx.guild.get_member(userid)==None:
-                            username='[deleted]'
-                        else:
-                            username=ctx.guild.get_member(userid).display_name
-                        if len(dbd[str(userid)].dropna())==0:
-                            zant="(未参加)"
-                        elif len(dbd[str(userid)].dropna())<14:
-                            zant="(暫定)"
-                        try:
-                            # if (dbd.iloc[-1].loc[str(userid)]==dbd.iloc[-1].loc[str(userid)]) and len(dbr)>1:
-                            if len(dbr)>1:
-                                change=("(+"+str(int(dbr.iloc[-1].loc[str(userid)]-dbr.iloc[-2].loc[str(userid)]))+")").replace("+-","-")
-                            else:
-                                change="(--)"
-                        except Exception as e:
-                            print(e)
-                            change=""
-                        try:
-                            if rate>=2800:
-                                color='\U0001f534'
-                            elif rate>=2400:
-                                color='\U0001f7e0'
-                            elif rate>=2000:
-                                color='\U0001f7e1'
-                            elif rate>=1600:
-                                color='\U0001f7e3'
-                            elif rate>=1200:
-                                color='\U0001f535'
-                            elif rate>=800:
-                                color='\U0001f7e2'
-                            elif rate>=400:
-                                color='\U0001f7e4'
-                            elif rate>=0:
-                                color='\U000026aa'
-                            else:
-                                color=""
-                        except Exception as e:
-                            print(e)
-                            color=""
-                        await ctx.send(str(rk+1)+'位:'+username+' '+str(rate)+color+change+zant)
-                except Exception as e:
-                    print(e)
-                    await ctx.send('引数が不正です。')
-            else:
-                await ctx.send('まだコンテストが開催されていません。')
-        else:
-            await ctx.send('初めに!atw start (絵文字)を実行してください。')
+            await ctx.send('まだコンテストが開催されていません。')
+    else:
+        await ctx.send('初めに!atw start (絵文字)を実行してください。')
     return
 
 @bot.command()
 async def perf_ranking(ctx, arg1, arg2):
     if ctx.author.bot:
         return
-    async with ctx.channel.typing():
-        if isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
-            dbd=get_cached_df('AtWaker_data_'+str(serverid))
-            try:
-                if arg1 == 'today':
-                    a = date.today().isoformat()
+    if isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
+        dbd=get_cached_df('AtWaker_data_'+str(serverid))
+        try:
+            if arg1 == 'today':
+                a = date.today().isoformat()
+            else:
+                a = arg1
+            z=max(int(arg2),1)
+            for rk in range(z-1,min(z-1+min_display,len(dbd.loc[a].dropna()))):
+                perf=int(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk])
+                userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
+                if ctx.guild.get_member(userid)==None:
+                    username='[deleted]'
                 else:
-                    a = arg1
-                z=max(int(arg2),1)
-                for rk in range(z-1,min(z-1+min_display,len(dbd.loc[a].dropna()))):
-                    perf=int(dbd.loc[a].dropna().sort_values(ascending=False).iloc[rk])
-                    userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
-                    if ctx.guild.get_member(userid)==None:
-                        username='[deleted]'
+                    username=ctx.guild.get_member(userid).display_name
+                try:
+                    if perf>=2800:
+                        color='\U0001f534'
+                    elif perf>=2400:
+                        color='\U0001f7e0'
+                    elif perf>=2000:
+                        color='\U0001f7e1'
+                    elif perf>=1600:
+                        color='\U0001f7e3'
+                    elif perf>=1200:
+                        color='\U0001f535'
+                    elif perf>=800:
+                        color='\U0001f7e2'
+                    elif perf>=400:
+                        color='\U0001f7e4'
+                    elif perf>=0:
+                        color='\U000026aa'
                     else:
-                        username=ctx.guild.get_member(userid).display_name
-                    try:
-                        if perf>=2800:
-                            color='\U0001f534'
-                        elif perf>=2400:
-                            color='\U0001f7e0'
-                        elif perf>=2000:
-                            color='\U0001f7e1'
-                        elif perf>=1600:
-                            color='\U0001f7e3'
-                        elif perf>=1200:
-                            color='\U0001f535'
-                        elif perf>=800:
-                            color='\U0001f7e2'
-                        elif perf>=400:
-                            color='\U0001f7e4'
-                        elif perf>=0:
-                            color='\U000026aa'
-                        else:
-                            color=""
-                    except Exception as e:
-                        print(e)
                         color=""
-                    await ctx.send(str(rk+1)+'位:'+username+' '+str(perf)+color)
-            except Exception as e:
-                print(e)
-                await ctx.send('引数が不正です。')
-        else:
-            await ctx.send('初めに!atw start (絵文字)を実行してください。')
+                except Exception as e:
+                    print(e)
+                    color=""
+                await ctx.send(str(rk+1)+'位:'+username+' '+str(perf)+color)
+        except Exception as e:
+            print(e)
+            await ctx.send('引数が不正です。')
+    else:
+        await ctx.send('初めに!atw start (絵文字)を実行してください。')
+    return
+
+@bot.command()
+async def contest_end(ctx, arg):
+    if ctx.author.id != 602203895464329216:
+        return
+    global num_ra
+    num_ra=1
+    await contest_end(arg)
     return
 
 @bot.command()
@@ -619,23 +628,6 @@ async def show_help(ctx):
     helpstr = f.read()
     f.close()
     await ctx.send(helpstr)
-    return
-
-@bot.command()
-async def contest_end(ctx, arg):
-    if ctx.author.id != 602203895464329216:
-        await ctx.send('そのコマンドは存在しません。')
-    global num_ra
-    num_ra=1
-    await contest_end(arg)
-    return
-
-
-  
-@bot.event
-async def on_member_join(member):
-    if not (serverid==None) and not (channelid==None):
-        renew_db(serverid)
     return
 
 @tasks.loop(seconds=60*interv)
