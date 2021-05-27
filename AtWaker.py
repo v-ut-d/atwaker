@@ -361,6 +361,8 @@ async def on_ready():
 async def on_raw_reaction_add(payload):
     global v
     global num_ra
+    global me
+    me=bot.user
     guild=bot.get_guild(serverid)
     channel = bot.get_channel(channelid)
     user=guild.get_member(payload.user_id)
