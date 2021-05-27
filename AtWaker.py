@@ -369,11 +369,11 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(e)
         return
-    print((contesting==1) , (user!=me))
-    if (contesting==1) and (user!=me):
+    print((contesting==1) , (user.id!=me.id))
+    if (contesting==1) and (user.id!=me.id):
         for i in range(msg_raz):
             bool1=(str(payload.emoji)==str(emj))
-            bool2=(msg.author==me) 
+            bool2=(msg.author.id==me.id) 
             # bool3=(reaction.message.content=='おはようございます！ Good morning!\n'+dt+'のAtWaker Contest開始です。\n起きた人は'+emj+'でリアクションしてね。')
             bool3=(msg.id==msg_id)
             print(bool1,bool2,bool3)
