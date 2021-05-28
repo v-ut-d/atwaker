@@ -419,8 +419,8 @@ async def start(ctx, emoji):
 #         try:
 #             dbr=get_cached_df('AtWaker_rate_'+str(serverid))
 #             dbd=get_cached_df('AtWaker_data_'+str(serverid))
-#             dbr.drop(arg,axis=0)
-#             dbd.drop(arg,axis=0)
+#             dbr=dbr.drop(arg,axis=0)
+#             dbd=dbd.drop(arg,axis=0)
 #             cache_df('AtWaker_rate_'+str(serverid),dbr)
 #             cache_df('AtWaker_data_'+str(serverid),dbd)
 #             await ctx.send(arg+'のデータを消去しました。')
