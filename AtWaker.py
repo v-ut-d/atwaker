@@ -192,16 +192,14 @@ async def contest_end(dt):
                     color='\U0001f7e2'
                 elif perf>=400:
                     color='\U0001f7e4'
-                elif perf>=0:
-                    color='\U000026aa'
                 else:
-                    color=""
+                    color='\U000026aa'
             except Exception as e:
                 print(j,e)
-                color=""
+                color='\U000026aa'
             await channel.send(str(j)+'位:'+str(jthuser.display_name)+' '
                                 +str(vs.iloc[j-1].loc['time'])+' パフォーマンス:'
-                                +str(perf)+color)
+                                +str(perf)+color+" "+str((perf-2731)/10)+"℃")
     else:
         await channel.send('ほんでーかれこれまぁ'+str(clen)+'分くらい、えー待ったんですけども参加者は誰一人来ませんでした。')
 
@@ -450,7 +448,7 @@ async def rating(ctx, arg, force=''):
                         change="(--)"
                 except Exception as e:
                     print(xx.display_name,e)
-                    change=""
+                    change="(--)"
                 if len(dbd[str(xx.id)].dropna())>0:
                     try:
                         rate=int(dbr.iloc[-1].loc[str(xx.id)])
@@ -477,14 +475,12 @@ async def rating(ctx, arg, force=''):
                         color='\U0001f7e2'
                     elif rate>=400:
                         color='\U0001f7e4'
-                    elif rate>=0:
-                        color='\U000026aa'
                     else:
-                        color=""
+                        color='\U000026aa'
                 except Exception as e:
                     print(e)
-                    color=""
-                msgstrs += [xx.display_name+':'+str(rate)+color+change+zant]
+                    color='\U000026aa'
+                msgstrs += [xx.display_name+':'+str(rate)+color+change+" "+str((rate-2731)/10)+"℃ "+zant]
                 if num > 10 and force!='force':
                     await ctx.send('該当するユーザーが多すぎます。検索条件を厳しくしてください。')
                     return
@@ -531,7 +527,7 @@ async def rating_ranking(ctx, arg):
                             change="(--)"
                     except Exception as e:
                         print(e)
-                        change=""
+                        change="(--)"
                     try:
                         if rate>=2800:
                             color='\U0001f534'
@@ -547,14 +543,12 @@ async def rating_ranking(ctx, arg):
                             color='\U0001f7e2'
                         elif rate>=400:
                             color='\U0001f7e4'
-                        elif rate>=0:
-                            color='\U000026aa'
                         else:
-                            color=""
+                            color='\U000026aa'
                     except Exception as e:
                         print(e)
-                        color=""
-                    await ctx.send(str(rk+1)+'位:'+username+' '+str(rate)+color+change+zant)
+                        color='\U000026aa'
+                    await ctx.send(str(rk+1)+'位:'+username+' '+str(rate)+color+change+" "+str((rate-2731)/10)+"℃ "+zant)
             except Exception as e:
                 print(e)
                 await ctx.send('引数が不正です。')
@@ -598,14 +592,12 @@ async def perf_ranking(ctx, arg1, arg2):
                         color='\U0001f7e2'
                     elif perf>=400:
                         color='\U0001f7e4'
-                    elif perf>=0:
-                        color='\U000026aa'
                     else:
-                        color=""
+                        color='\U000026aa'
                 except Exception as e:
                     print(e)
-                    color=""
-                await ctx.send(str(rk+1)+'位:'+username+' '+str(perf)+color)
+                    color='\U000026aa'
+                await ctx.send(str(rk+1)+'位:'+username+' '+str(perf)+color+" "+str((perf-2731)/10)+"℃ ")
         except Exception as e:
             print(e)
             await ctx.send('引数が不正です。')
