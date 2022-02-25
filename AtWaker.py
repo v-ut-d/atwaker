@@ -44,6 +44,7 @@ emj='<:ohayo:805676181328232448>'
 contesting=0
 num_ra=0
 min_display=10
+auth=805067817271558184
 conn=r.connect()
 
 def cache_df(alias,df):
@@ -68,6 +69,7 @@ def load_vars():
     global contesting
     global num_ra
     global msg_id
+    global auth
     if 'emj' in dbv.index:
         emj=dbv.loc['emj','variables']
     if 'contesting' in dbv.index:
@@ -76,10 +78,12 @@ def load_vars():
         num_ra=int(dbv.loc['num_ra','variables'])
     if 'msg_id' in dbv.index:
         msg_id=int(dbv.loc['msg_id','variables'])
+    if 'auth' in dbv.index:
+        auth=int(dbv.loc['auth','variables'])
     return
 
 def save_vars():
-    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting],[msg_id]],index=['emj','num_ra','contesting','msg_id'],columns=['variables'])
+    vars=pd.DataFrame([[str(emj)],[num_ra],[contesting],[msg_id],[auth]],index=['emj','num_ra','contesting','msg_id','auth'],columns=['variables'])
     cache_df("variables_"+str(serverid),vars)
     cache_df("v_"+str(serverid),v)
 
@@ -500,6 +504,7 @@ async def rating_ranking(ctx, arg):
     if isinstance(get_cached_df('AtWaker_rate_'+str(serverid)),pd.DataFrame):
         dbr=get_cached_df('AtWaker_rate_'+str(serverid))
         dbd=get_cached_df('AtWaker_data_'+str(serverid))
+        authrole=ctx.guild.get_role(auth)
         if len(dbr)>0:
             try:
                 z=max(int(arg),1)
@@ -513,8 +518,10 @@ async def rating_ranking(ctx, arg):
                     zant=""
                     if ctx.guild.get_member(userid)==None:
                         username='[deleted]'
-                    else:
+                    elif authrole in ctx.guild.get_member(userid).roles:
                         username=ctx.guild.get_member(userid).display_name
+                    else:
+                        username="[未認証]"
                     if len(dbd[str(userid)].dropna())==0:
                         zant="(未参加)"
                     elif len(dbd[str(userid)].dropna())<14:
@@ -564,6 +571,7 @@ async def perf_ranking(ctx, arg1, arg2):
         return
     if isinstance(get_cached_df('AtWaker_data_'+str(serverid)),pd.DataFrame):
         dbd=get_cached_df('AtWaker_data_'+str(serverid))
+        authrole=ctx.guild.get_role(auth)
         try:
             if arg1 == 'today':
                 a = date.today().isoformat()
@@ -575,8 +583,10 @@ async def perf_ranking(ctx, arg1, arg2):
                 userid=int(dbd.loc[a].dropna().sort_values(ascending=False).index[rk])
                 if ctx.guild.get_member(userid)==None:
                     username='[deleted]'
-                else:
+                elif authrole in ctx.guild.get_member(userid).roles:
                     username=ctx.guild.get_member(userid).display_name
+                else:
+                    username="[未認証]"
                 try:
                     if perf>=2800:
                         color='\U0001f534'
