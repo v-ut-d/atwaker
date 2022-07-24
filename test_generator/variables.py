@@ -25,7 +25,7 @@ def record_rank_to_v(v: pd.DataFrame, user_id: str, now: datetime, msg_raz: int,
 def init_db():
     # 行がコンテストに, 列がユーザーに対応。パフォーマンスを格納している。
     db = pd.DataFrame(columns=['dummy'])
-    db.loc['1970-01-01'] = [np.nan]
+    # db.loc['1970-01-01'] = [np.nan]
     return db
 
 

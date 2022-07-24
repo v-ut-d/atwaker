@@ -22,14 +22,14 @@ def simulate_contest(perf_db: pd.DataFrame, rate_db: pd.DataFrame, user_ids: lis
     v = init_v(msg_raz)
 
     time_base = TODAY+timedelta(hours=HS-9, minutes=MS)
-    print(time_base, time_base.timestamp())
+    # print(time_base, time_base.timestamp())
     for user_id in user_ids:
         now = time_base+timedelta(seconds=randrange(1, 60*CLEN))
         num_ra += record_rank_to_v(v, user_id, now, msg_raz, HS, MS, CLEN)
 
     perf_db.loc[dt] = [np.nan for _ in range(len(perf_db.columns))]
     perf_calc(perf_db, v, dt, msg_raz, CLEN)
-    rate_calc(perf_db, rate_db, dt)
+    # rate_calc(perf_db, rate_db, dt)
 
     return v
 
@@ -47,7 +47,7 @@ def simulate_contests(days: int, max_users: int):
     return (perf_db, rate_db, v_list)
 
 
-perf_db, rate_db, v_list = simulate_contests(30, 10)
+perf_db, rate_db, v_list = simulate_contests(10, 10)
 print('\nSimulation finished. Generating tables...')
 if not os.path.exists('data'):
     os.makedirs('data')

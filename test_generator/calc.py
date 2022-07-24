@@ -10,10 +10,10 @@ def perf_calc(dbc:pd.DataFrame,v:pd.DataFrame,dt:str,msg_raz:int,clen:int):
     v=v.sort_values(by='total',ascending=False)
     v['rank']=((max(v['total'].values)-v['total'].values)/(60*clen*(msg_raz+1)/2))*(len(v)-1)
     vc=v['rank']
-    print(v)
-    print(vc)
+    # print(v)
+    # print(vc)
 
-    # calculate perf
+    # calculate aperf(inner rate)
     aperf=pd.Series([np.nan]*len(vc),index=vc.index)
     for user in vc.index:
         user=str(user)
@@ -28,21 +28,27 @@ def perf_calc(dbc:pd.DataFrame,v:pd.DataFrame,dt:str,msg_raz:int,clen:int):
                 aperfden+=0.9**(i+1)
             aperf.at[user]=aperfnom/aperfden
     aperf=aperf.sort_values(ascending=False)
+
+    # calculate inner perf
     xx=-int(800*np.log(len(vc))/np.log(6))
     r0=np.array([0]+list(vc.values))
     rdiff=r0[1:]-r0[:-1]
     r1=r0[1:]-rdiff[0]/2+max(0,1/60/clen*len(vc)-rdiff[0])
     rdiff[0]=max(1/60/clen*len(vc),rdiff[0])
     s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
-    print(list(1/(1+6.0**((xx-aperf.values)/400))))
+    # print(list(1/(1+6.0**((xx-aperf.values)/400))))
     for j in range(len(vc))[::-1]:
-        print(xx,s)
+        # print(xx,s)
         while s>r1[j]:
             xx+=1
             s=np.sum(rdiff/(1+6.0**((xx-aperf.values)/400)))
         dbc.at[dbc.index[-1],vc.index[j]]=int(xx)
+    
+    # adjust performance at the first contest
     if len(dbc)==1:
         dbc.iloc[-1]=((dbc.iloc[-1].values-1200)*3)//2+1200
+    
+    # unknown
     perfave=dbc.iloc[-1].dropna().mean()
     perfstd=dbc.iloc[-1].dropna().std(ddof=0)
     correctionave=1200+300*np.log(len(dbc.iloc[-1].dropna()))
@@ -50,11 +56,14 @@ def perf_calc(dbc:pd.DataFrame,v:pd.DataFrame,dt:str,msg_raz:int,clen:int):
     dbc.iloc[-1]+=correctionave-perfave
     if len(dbc.iloc[-1].dropna())>1:
         dbc.iloc[-1]=correctionave+(dbc.iloc[-1]-correctionave)*correctionstd/perfstd
+
+    # beginner correction
     for j in range(len(vc))[::-1]:
         if dbc.at[dt,vc.index[j]]<=400:
             dbc.at[dt,vc.index[j]]=int(400*np.e**(dbc.iloc[-1].loc[vc.index[j]]/400-1))
         elif dbc.at[dt,vc.index[j]]*0==0:
             dbc.at[dt,vc.index[j]]=int(dbc.iloc[-1].loc[vc.index[j]])
+    
     return 
 
 def rate_calc(db:pd.DataFrame,dbr:pd.DataFrame,dt:str):
