@@ -667,15 +667,14 @@ load_vars()
 # contesting=int(dbv.loc['contesting','variables'])
 # num_ra=int(dbv.loc['num_ra','variables'])
 
+# Botの起動とDiscordサーバーへの接続
+bot.run(TOKEN)
+
+
 #ループ処理実行
 async def run_loop():
     await loop.start()
 asyncio.run(run_loop())
 
 
-# Botの起動とDiscordサーバーへの接続
-
-
-bot.run(TOKEN)
-# client.run(TOKEN)
 
