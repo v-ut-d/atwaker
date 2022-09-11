@@ -43,13 +43,16 @@ num_ra=0
 min_display=10
 auth=805067817271558184
 
-def cache_df(alias:str,df:pd.DataFrame):
-    res = df.to_csv('data/{0}.csv'.format(alias.replace('/','-')))
-    if res:
-        print('df cached')
 
-def get_cached_df(alias:str):
-    return pd.read_csv('data/{0}.csv'.format(alias.replace('/','-')))
+def cache_df(alias: str, df: pd.DataFrame):
+    df.to_csv('data/{0}.csv'.format(alias.replace('/', '-')))
+
+
+def get_cached_df(alias: str):
+    try:
+        return pd.read_csv('data/{0}.csv'.format(alias.replace('/', '-')), index_col=0)
+    except:
+        return None
 
 def load_vars():
     global v
