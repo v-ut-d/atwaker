@@ -4,11 +4,7 @@ import numpy as np
 import os
 from discord.ext import tasks, commands
 from datetime import datetime, timedelta, date
-# from dotenv import load_dotenv
 import time
-# import asyncio
-import r
-import pickle
 
 # .envファイルの内容を読み込みます
 # load_dotenv()
@@ -45,21 +41,14 @@ contesting=0
 num_ra=0
 min_display=10
 auth=805067817271558184
-conn=r.connect()
 
-def cache_df(alias,df):
-    df_compressed = pickle.dumps(df)
-    res = conn.set(alias,df_compressed)
+def cache_df(alias:str,df:pd.DataFrame):
+    res = df.to_csv('data/{0}'.format(alias.replace('/','-')))
     if res:
         print('df cached')
 
-def get_cached_df(alias):
-    data = conn.get(alias)
-    try:
-        return pickle.loads(data)
-    except:
-        print("No data")
-        return None
+def get_cached_df(alias:str):
+    return pd.read_csv('data/{0}'.format(alias.replace('/','-')))
 
 def load_vars():
     global v
