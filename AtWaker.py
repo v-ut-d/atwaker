@@ -5,6 +5,7 @@ import os
 from discord.ext import tasks, commands
 from datetime import datetime, timedelta, date
 import time
+import asyncio
 
 # .envファイルの内容を読み込みます
 # load_dotenv()
@@ -43,12 +44,12 @@ min_display=10
 auth=805067817271558184
 
 def cache_df(alias:str,df:pd.DataFrame):
-    res = df.to_csv('data/{0}'.format(alias.replace('/','-')))
+    res = df.to_csv('data/{0}.csv'.format(alias.replace('/','-')))
     if res:
         print('df cached')
 
 def get_cached_df(alias:str):
-    return pd.read_csv('data/{0}'.format(alias.replace('/','-')))
+    return pd.read_csv('data/{0}.csv'.format(alias.replace('/','-')))
 
 def load_vars():
     global v
@@ -667,7 +668,10 @@ load_vars()
 # num_ra=int(dbv.loc['num_ra','variables'])
 
 #ループ処理実行
-loop.start()
+async def run_loop():
+    await loop.start()
+asyncio.run(run_loop())
+
 
 # Botの起動とDiscordサーバーへの接続
 
