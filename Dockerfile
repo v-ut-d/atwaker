@@ -15,4 +15,4 @@ COPY AtWaker.py /app
 
 WORKDIR /app
 
-CMD ["python", "/app/AtWaker.py"]
+CMD ["python", "-u", "/app/AtWaker.py"]
