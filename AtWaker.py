@@ -152,7 +152,7 @@ async def contest_msg():
     channel = bot.get_channel(channelid)
     dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
     msg=await channel.send(dt)    
-    await msg.add_reaction(emoji=emj)
+    await msg.add_reaction(emj)
     global msg_id
     msg_id=msg.id
     save_vars()

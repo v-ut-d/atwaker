@@ -2,7 +2,7 @@ version: '3'
 
 services:
   atwaker:
-    image: ghcr.io/v-ut-d/atwaker:latest
+    build: .
     volumes:
       - ./data:/app/data
     environment:
