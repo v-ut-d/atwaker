@@ -44,9 +44,10 @@ min_display=10
 auth=805067817271558184
 
 
-def cache_df(alias: str, df: pd.DataFrame):
+def cache_df(alias: str, df: pd.DataFrame | None):
     name = alias.replace('/', '-')
-    df.to_json(f'data/{name}.json', orient='table')
+    if df is not None:
+        df.to_json(f'data/{name}.json', orient='table')
 
 
 def get_cached_df(alias: str):
@@ -56,10 +57,16 @@ def get_cached_df(alias: str):
     except:
         return None
 
+
 def load_vars():
     global v
-    dbv=get_cached_df('variables_'+str(serverid))
-    v=get_cached_df('v_'+str(serverid))
+    v = get_cached_df('v_'+str(serverid))
+
+    dbv = get_cached_df('variables_'+str(serverid))
+    if dbv is None:
+        save_vars()
+        return
+
     global emj
     global contesting
     global num_ra
