@@ -45,12 +45,14 @@ auth=805067817271558184
 
 
 def cache_df(alias: str, df: pd.DataFrame):
-    df.to_csv('data/{0}.csv'.format(alias.replace('/', '-')))
+    name = alias.replace('/', '-')
+    df.to_json(f'data/{name}.json', orient='table')
 
 
 def get_cached_df(alias: str):
+    name = alias.replace('/', '-')
     try:
-        return pd.read_csv('data/{0}.csv'.format(alias.replace('/', '-')), index_col=0)
+        return pd.read_json(f'data/{name}.json', orient='table')
     except:
         return None
 
