@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 from discord.ext import tasks, commands
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 import time
 import asyncio
 
@@ -641,33 +641,39 @@ async def show_help(ctx):
     await ctx.send(embed=embed)
     return
 
-@tasks.loop(seconds=60*interv)
-async def loop():
-    # 現在の時刻
-    now=(time.time()+3600*9)%86400
-    print(now)
-    bool1l=(3600*hs+60*ms<=now<3600*hs+60*(ms+interv))
-    bool2l= not (serverid==None)
-    bool3l= not (channelid==None)
-    bool4l= (contesting==0)
-    dfd=get_cached_df('AtWaker_data_'+str(serverid))
-    dfr=get_cached_df('AtWaker_rate_'+str(serverid))
-    bool5l=isinstance(dfd, pd.DataFrame)
-    bool6l=isinstance(dfr, pd.DataFrame)
-    print(bool1l ,bool2l ,bool3l,bool4l,bool5l,bool6l)
-    if bool1l and bool2l and bool3l and bool4l and bool5l and bool6l:
+
+
+tz_jst = timezone(timedelta(hours=9))
+
+
+def create_time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, fold=0):
+    basetime = datetime(year=1970, month=1, day=1, tzinfo=tzinfo, fold=fold)
+    delta = timedelta(hours=hour, minutes=minute,
+                      seconds=second, microseconds=microsecond)
+    return (basetime+delta).time()
+
+@tasks.loop(time=create_time(hour=hs, minute=ms, tzinfo=tz_jst))
+async def on_contest_start():
+    bool2l = not (serverid == None)
+    bool3l = not (channelid == None)
+    bool4l = (contesting == 0)
+    dfd = get_cached_df('AtWaker_data_'+str(serverid))
+    dfr = get_cached_df('AtWaker_rate_'+str(serverid))
+    bool5l = isinstance(dfd, pd.DataFrame)
+    bool6l = isinstance(dfr, pd.DataFrame)
+    if bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
-    elif(3600*hs+60*(ms+clen)<=now<3600*hs+60*(ms+interv+clen)) and (not bool4l):
-        dt=(datetime.now()+timedelta(hours=9)).strftime('%Y-%m-%d')
+
+@tasks.loop(time=create_time(hour=hs, minute=ms+clen, tzinfo=tz_jst))
+async def on_contest_end():
+    if contesting != 0:
+        dt = datetime.now(tz_jst).strftime('%Y-%m-%d')
         await contest_end(dt)
-    elif(3600*hgn+60*mgn-300*interv<=now<3600*hgn+60*mgn-240*interv):
-        channel = bot.get_channel(channelid)
-        await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
-    # else:
-    #     for i in range(1,msg_raz):
-    #         if (3600*hs+60*(ms+clen*i/msg_raz)<=now<3600*hs+60*(ms+interv+clen*i/msg_raz)) and (not bool4l) and bool5l and bool6l:
-    #             await contest_msg(i)
-    return
+
+@tasks.loop(time=create_time(hour=hgn, minute=mgn-5, tzinfo=tz_jst))
+async def on_bedtime():
+    channel = bot.get_channel(channelid)
+    await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
 
 #変数読み込み
 load_vars()
@@ -683,7 +689,9 @@ load_vars()
 #ループ処理実行
 async def run():
     await asyncio.gather(
-        loop.start(),
+        on_contest_start.start(),
+        on_contest_end.start(),
+        on_bedtime.start(),
         bot.start(TOKEN)
     )
 asyncio.run(run())
