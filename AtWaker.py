@@ -650,7 +650,7 @@ def create_time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, fold=0):
     basetime = datetime(year=1970, month=1, day=1, tzinfo=tzinfo, fold=fold)
     delta = timedelta(hours=hour, minutes=minute,
                       seconds=second, microseconds=microsecond)
-    return (basetime+delta).time()
+    return (basetime+delta).timetz()
 
 @tasks.loop(time=create_time(hour=hs, minute=ms, tzinfo=tz_jst))
 async def on_contest_start():
