@@ -7,6 +7,10 @@ from datetime import datetime, timedelta, date, timezone
 import time
 import asyncio
 
+import random
+contest_delay = random.random()*60
+print(f"Contest delay(second): {contest_delay}")
+
 # .envファイルの内容を読み込みます
 # load_dotenv()
 TOKEN = os.environ['TOKEN']
@@ -356,6 +360,7 @@ async def on_ready():
         renew_db(serverid)
     else:
         make_db(serverid)
+    await asyncio.sleep(contest_delay)
     await channel.send(emj)
     return
 
@@ -642,7 +647,6 @@ async def show_help(ctx):
     return
 
 
-
 tz_jst = timezone(timedelta(hours=9))
 
 
@@ -652,7 +656,8 @@ def create_time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, fold=0):
                       seconds=second, microseconds=microsecond)
     return (basetime+delta).timetz()
 
-@tasks.loop(time=create_time(hour=hs, minute=ms, tzinfo=tz_jst))
+
+@tasks.loop(time=create_time(hour=hs, minute=ms, second=contest_delay, tzinfo=tz_jst))
 async def on_contest_start():
     bool2l = not (serverid == None)
     bool3l = not (channelid == None)
@@ -664,13 +669,15 @@ async def on_contest_start():
     if bool2l and bool3l and bool4l and bool5l and bool6l:
         await contest()
 
-@tasks.loop(time=create_time(hour=hs, minute=ms+clen, tzinfo=tz_jst))
+
+@tasks.loop(time=create_time(hour=hs, minute=ms+clen, second=contest_delay, tzinfo=tz_jst))
 async def on_contest_end():
     if contesting != 0:
         dt = datetime.now(tz_jst).strftime('%Y-%m-%d')
         await contest_end(dt)
 
-@tasks.loop(time=create_time(hour=hgn, minute=mgn-5, tzinfo=tz_jst))
+
+@tasks.loop(time=create_time(hour=hgn, minute=mgn-5, second=contest_delay, tzinfo=tz_jst))
 async def on_bedtime():
     channel = bot.get_channel(channelid)
     await channel.send('みんな寝る時間ですよ！おやすみー！また明日！')
